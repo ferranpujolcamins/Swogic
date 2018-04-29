@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftGraph",
+        "repositoryURL": "https://github.com/ferranpujolcamins/SwiftGraph",
+        "state": {
+          "branch": "UniqueVerticesGraph",
+          "revision": "d6338596a4956113f321c4c3905f73cdde916cd1",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

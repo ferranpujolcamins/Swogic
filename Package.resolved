@@ -3,10 +3,10 @@
     "pins": [
       {
         "package": "SwiftGraph",
-        "repositoryURL": "https://github.com/ferranpujolcamins/SwiftGraph",
+        "repositoryURL": "https://github.com/davecom/SwiftGraph",
         "state": {
-          "branch": "UniqueVerticesGraph",
-          "revision": "d6338596a4956113f321c4c3905f73cdde916cd1",
+          "branch": "master",
+          "revision": "4fa0dbe52ff6fe6f9194d1599c42e8b27f131657",
           "version": null
         }
       }

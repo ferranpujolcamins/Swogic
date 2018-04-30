@@ -1,5 +1,7 @@
 import SwiftGraph
 
+// TODO: ADD CI MARKUP TAGS TO README.md
+
 infix operator ---| : MultiplicationPrecedence
 infix operator |---> : MultiplicationPrecedence
 
@@ -80,7 +82,6 @@ struct ActionChain<LastActionResultType: Result>: AnyActionChain {
 class Flow {
     init(_ actionChains: AnyActionChain...) {
         for actionChain in actionChains {
-            // TODO: ADD CI MARKUP TAGS TO README.md
         }
     }
 }

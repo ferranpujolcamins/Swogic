@@ -12,7 +12,7 @@ let package = Package(
             targets: ["Swogic"]),
     ],
     dependencies: [
-        .package(url:"https://github.com/ferranpujolcamins/SwiftGraph", .branch("UniqueVerticesGraph")),
+        .package(url:"https://github.com/davecom/SwiftGraph", .branch("master")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

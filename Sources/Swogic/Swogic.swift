@@ -6,12 +6,29 @@ infix operator |---> : MultiplicationPrecedence
 protocol AnyAction {
 }
 
-// TODO: result type should be equatable, add protocol for result
-class Action<ResultType>: AnyAction {
+protocol Result: Equatable {
+
+}
+
+enum VoidResult: Result {
+
+    init() {
+        self = .void;
+    }
+
+    case void
+
+    static func ==(lhs: VoidResult, rhs: VoidResult) -> Bool {
+        return true
+    }
+}
+
+class Action<ResultType: Result>: AnyAction {
 
     // MARK: - Public interface:
 
     init(_ action: @escaping () -> ResultType) {
+
         self.action = action
     }
 
@@ -25,9 +42,17 @@ class Action<ResultType>: AnyAction {
     }
 }
 
-class EndOperation: Action<Void> {
+extension Action where ResultType == VoidResult {
 
+    convenience init(_ action: @escaping () -> Void) {
+        self.init { () -> VoidResult in
+            action()
+            return .void
+        }
+    }
 }
+
+typealias VoidAction = Action<VoidResult>
 
 struct ActionPreChain {
 
@@ -42,7 +67,7 @@ protocol AnyActionChain: AnyAction {
 
 }
 
-struct ActionChain<LastActionResultType>: AnyActionChain {
+struct ActionChain<LastActionResultType: Result>: AnyActionChain {
 
     let preChain: ActionPreChain;
     let nextAction: Action<LastActionResultType>;
@@ -55,7 +80,7 @@ struct ActionChain<LastActionResultType>: AnyActionChain {
 class Flow {
     init(_ actionChains: AnyActionChain...) {
         for actionChain in actionChains {
-            
+            // TODO: ADD CI MARKUP TAGS TO README.md
         }
     }
 }
@@ -64,9 +89,10 @@ class Flow {
 // v2
 /*
 let flow = Flow(
-    login ---|.ok |---> request ---|.ok |---> endAction,
-    login ---|.ok |---> request ---|.401|---> refresh,
-    login ---|.401|---> refresh,
+    login ---| .ok   |---> request ---|.ok |---> endAction,
+    login ---| .ok   |---> request ---|.c401|---> refresh,
+    login ---| .c401 |---> refresh,
+    login ---| .c500 |---> action1 ---> action2
 
     refresh: refresh ---|.ok  |---> retry,
              refresh ---|.fail|---> reportError

@@ -31,6 +31,16 @@ final class SwogicTests: XCTestCase {
             action1 ---| "abc" |---> action2 ---| 3 |---> action3,
             action1 ---| "zzz" |---> action3
         )
+
+        _ = Action {
+            print("I return nothing")
+        } as Action<VoidResult>
+
+        let voidAction = Action {
+            print("I return nothing")
+        }
+
+        _ = action1 ---| "abc" |---> action2 ---| 3 |---> voidAction
     }
 
 

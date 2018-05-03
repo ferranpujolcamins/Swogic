@@ -1,38 +1,12 @@
-import SwiftGraph
-
 // TODO: ADD CI MARKUP TAGS TO README.md
 
 prefix operator *
 infix operator --- : MultiplicationPrecedence
 infix operator ---> : MultiplicationPrecedence
 
-protocol Swogicable {}
+public protocol AnyStep {}
 
-// unit type
-enum Void: Swogicable {
-
-    init() {
-        self = .void
-    }
-
-    case void
-
-    static func ==(lhs: Void, rhs: Void) -> Bool {
-        return true
-    }
-}
-
-enum BottomType: Swogicable {
-
-    static func ==(lhs: BottomType, rhs: BottomType) -> Bool {
-        return false
-    }
-}
-
-
-protocol AnyStep {}
-
-struct Step<I: Swogicable, O: Swogicable>: AnyStep {
+struct Step<I, O>: AnyStep {
     private var specific: Bool = false;
 
     static prefix func * (_ step: Step<I, O>) -> Step<I, O> {
@@ -84,51 +58,6 @@ internal struct MatchCondition<I: Equatable>: AnyStep {
             return true
         }
         return false
-    }
-}
-
-fileprivate indirect enum StepChainDataStructure {
-    case step(AnyStep)
-    case stepChain(StepChainDataStructure, AnyStep)
-
-    public init(_ step: AnyStep) {
-        self = .step(step)
-    }
-
-    public static func + (_ chain: StepChainDataStructure, _ newStep: AnyStep) -> StepChainDataStructure {
-        switch chain {
-        case .step(let step):
-            return .stepChain(.step(step), newStep)
-
-        case .stepChain (let innerChain, let step):
-            return .stepChain(innerChain + step, newStep)
-        }
-    }
-}
-
-struct StepChain<I: Swogicable, O: Swogicable> {
-    private var stepChainData: StepChainDataStructure
-
-    public init(step: AnyStep) {
-        self.stepChainData = StepChainDataStructure(step)
-    }
-
-    private init(stepChainData: StepChainDataStructure) {
-        self.stepChainData = stepChainData
-    }
-
-    static func ---> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
-        return StepChain(stepChainData: stepChain.stepChainData + newStep)
-    }
-
-    static func ---> (_ stepChain: StepChain<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
-        return StepChain(stepChainData: stepChain.stepChainData + condition)
-    }
-}
-
-extension StepChain where O: Equatable {
-    static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
-        return StepChain(stepChainData: stepChain.stepChainData + condition)
     }
 }
 

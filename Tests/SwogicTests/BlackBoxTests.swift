@@ -1,6 +1,7 @@
 import XCTest
-@testable import Swogic
+import Swogic
 
+// we use this tests, among other things, to test that the access levels set aree correct
 final class SwogicTests: XCTestCase {
 
 

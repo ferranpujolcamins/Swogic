@@ -24,10 +24,10 @@ fileprivate indirect enum StepChainDataStructure {
     }
 }
 
-struct StepChain<I, O> {
+public struct StepChain<I, O> {
     private var stepChainData: StepChainDataStructure
 
-    public init(step: AnyStep) {
+    internal init(step: AnyStep) {
         self.stepChainData = StepChainDataStructure(step)
     }
 
@@ -35,17 +35,17 @@ struct StepChain<I, O> {
         self.stepChainData = stepChainData
     }
 
-    static func ---> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
+    public static func ---> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + newStep)
     }
 
-    static func ---> (_ stepChain: StepChain<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
+    public static func ---> (_ stepChain: StepChain<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + condition)
     }
 }
 
 extension StepChain where O: Equatable {
-    static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
+    public static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + condition)
     }
 }

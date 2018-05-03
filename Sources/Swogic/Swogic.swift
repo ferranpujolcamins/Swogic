@@ -2,89 +2,116 @@ import SwiftGraph
 
 // TODO: ADD CI MARKUP TAGS TO README.md
 
+prefix operator *
 infix operator ---| : MultiplicationPrecedence
 infix operator |---> : MultiplicationPrecedence
+infix operator ------> : MultiplicationPrecedence
 
-protocol AnyAction {
-}
+protocol Swogicable {}
 
-protocol Result: Equatable {
-
-}
-
-enum VoidResult: Result {
+// unit type
+enum Void: Swogicable {
 
     init() {
-        self = .void;
+        self = .void
     }
 
     case void
 
-    static func ==(lhs: VoidResult, rhs: VoidResult) -> Bool {
+    static func ==(lhs: Void, rhs: Void) -> Bool {
         return true
     }
 }
 
-class Action<ResultType: Result>: AnyAction {
+enum BottomType: Swogicable {
 
-    // MARK: - Public interface:
+    static func ==(lhs: BottomType, rhs: BottomType) -> Bool {
+        return false
+    }
+}
 
-    init(_ action: @escaping () -> ResultType) {
 
+struct Action<I: Swogicable, O: Swogicable> {
+
+
+    static prefix func * (_ action: Action<I, O>) -> Step<I, O> {
+        return Step(action, specific: true)
+    }
+
+    static func ------> <U> (_ lhs: Action<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
+        return *lhs ------> *rhs
+    }
+
+    static func ------> <U> (_ lhs: Action<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
+        return *lhs ------> rhs
+    }
+
+    static func ------> <U> (_ lhs: Step<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
+        return lhs ------> *rhs
+    }
+
+    static func ------> <U> (_ lhs: StepChain<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
+        return lhs ------> *rhs
+    }
+}
+
+protocol AnyStep {}
+
+struct Step<I: Swogicable, O: Swogicable>: AnyStep {
+
+    let action: Action<I, O>
+
+    init(_ action: Action<I, O>, specific: Bool = false) {
         self.action = action
     }
 
-    // MARK: - Implementation
-
-    let action: () -> ResultType
-
-    // TODO: postfix and infix version of operators that emit a custom warning of whitespace with operators
-    static func ---| (action: Action<ResultType> , result: ResultType) -> ActionPreChain {
-        return ActionPreChain(action: action, result: result)
+    static func ------> <U> (_ lhs: Step<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
+        return StepChain(step: lhs) ------> rhs
     }
 }
 
-extension Action where ResultType == VoidResult {
+protocol AnyStepChain {
+}
 
-    convenience init(_ action: @escaping () -> Void) {
-        self.init { () -> VoidResult in
-            action()
-            return .void
+extension AnyStepChain {
+}
+
+fileprivate indirect enum StepChainDataStructure {
+    case step(AnyStep)
+    case stepChain(StepChainDataStructure, AnyStep)
+
+    public init(_ step: AnyStep) {
+        self = .step(step)
+    }
+
+    public static func + (_ chain: StepChainDataStructure, _ newStep: AnyStep) -> StepChainDataStructure {
+        switch chain {
+        case .step(let step):
+            return .stepChain(.step(step), newStep)
+
+        case .stepChain (let innerChain, let step):
+            return .stepChain(innerChain + step, newStep)
         }
     }
 }
 
-typealias VoidAction = Action<VoidResult>
+struct StepChain<I: Swogicable, O: Swogicable> {
+    private var stepChainData: StepChainDataStructure
 
-struct ActionPreChain {
+    public init(step: AnyStep) {
+        self.stepChainData = StepChainDataStructure(step)
+    }
 
-    let action: AnyAction
-    let result: Any
-    static func |---> <NextActionResultType> (preChain: ActionPreChain , nextAction: Action<NextActionResultType>) -> ActionChain<NextActionResultType> {
-        return ActionChain<NextActionResultType>(preChain: preChain, nextAction: nextAction)
+    private init(stepChainData: StepChainDataStructure) {
+        self.stepChainData = stepChainData
+    }
+
+    static func ------> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
+        return StepChain(stepChainData: stepChain.stepChainData + newStep)
     }
 }
 
-protocol AnyActionChain: AnyAction {
-
-}
-
-struct ActionChain<LastActionResultType: Result>: AnyActionChain {
-
-    let preChain: ActionPreChain;
-    let nextAction: Action<LastActionResultType>;
-
-    static func ---| (ac: ActionChain<LastActionResultType>, result: LastActionResultType) -> ActionPreChain {
-        return ActionPreChain(action: ac, result: result)
-    }
-}
-
-class Flow {
-    init(_ actionChains: AnyActionChain...) {
-        for actionChain in actionChains {
-        }
-    }
-}
+// DSL motivated types
 
 
 // v2

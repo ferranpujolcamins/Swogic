@@ -1,3 +1,4 @@
-extension String: Result {}
-extension Bool: Result {}
-extension Int: Result {}
+extension String: Swogicable {}
+extension Bool: Swogicable {}
+extension Int: Swogicable {}
+extension Double: Swogicable {}

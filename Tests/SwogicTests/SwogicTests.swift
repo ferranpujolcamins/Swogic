@@ -3,6 +3,24 @@ import XCTest
 
 final class SwogicTests: XCTestCase {
 
+
+    func testNew() {
+
+        // Actions can be values or class! If value, we add new, if class, we try to match??
+        let action1 = Action<String, Int>()
+        let action2 = Action<Int, Double>()
+        let action3 = Action<Double, String>()
+
+        action1 ------> action2 ------> action3
+
+
+    }
+
+
+
+
+
+
     func testOperationAndResultComposition() {
         let action1 = Action<String> { () -> String in
             print("I return 'abc'")
@@ -41,6 +59,12 @@ final class SwogicTests: XCTestCase {
         }
 
         _ = action1 ---| "abc" |---> action2 ---| 3 |---> voidAction
+
+
+        _ = Flow(
+            Action{ return true } ---| true |---> Action{ print("4") }
+        )
+
     }
 
 

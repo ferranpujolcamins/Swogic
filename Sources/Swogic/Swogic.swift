@@ -30,37 +30,15 @@ enum BottomType: Swogicable {
 }
 
 
-struct Action<I: Swogicable, O: Swogicable> {
-
-
-    static prefix func * (_ action: Action<I, O>) -> Step<I, O> {
-        return Step(action, specific: true)
-    }
-
-    static func ---> <U> (_ lhs: Action<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
-        return *lhs ---> *rhs
-    }
-
-    static func ---> <U> (_ lhs: Action<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
-        return *lhs ---> rhs
-    }
-
-    static func ---> <U> (_ lhs: Step<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
-        return lhs ---> *rhs
-    }
-
-    static func ---> <U> (_ lhs: StepChain<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
-        return lhs ---> *rhs
-    }
-}
-
 protocol AnyStep {}
 
 struct Step<I: Swogicable, O: Swogicable>: AnyStep {
-    let action: Action<I, O>
+    private var specific: Bool = false;
 
-    init(_ action: Action<I, O>, specific: Bool = false) {
-        self.action = action
+    static prefix func * (_ step: Step<I, O>) -> Step<I, O> {
+        var newStep = step;
+        newStep.specific = true;
+        return newStep
     }
 
     static func ---> <U> (_ lhs: Step<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {

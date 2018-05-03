@@ -11,8 +11,9 @@ final class SwogicTests: XCTestCase {
         let action2 = Action<Int, Double>()
         let action3 = Action<Double, String>()
 
-        action1 ------> action2 ------> action3
+        action1 ---> action2 ---> action3
 
+        *action1 --- { $0 < 2 } ---> *action2
 
     }
 

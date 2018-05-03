@@ -3,9 +3,8 @@ import SwiftGraph
 // TODO: ADD CI MARKUP TAGS TO README.md
 
 prefix operator *
-infix operator ---| : MultiplicationPrecedence
-infix operator |---> : MultiplicationPrecedence
-infix operator ------> : MultiplicationPrecedence
+infix operator --- : MultiplicationPrecedence
+infix operator ---> : MultiplicationPrecedence
 
 protocol Swogicable {}
 
@@ -38,42 +37,76 @@ struct Action<I: Swogicable, O: Swogicable> {
         return Step(action, specific: true)
     }
 
-    static func ------> <U> (_ lhs: Action<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
-        return *lhs ------> *rhs
+    static func ---> <U> (_ lhs: Action<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
+        return *lhs ---> *rhs
     }
 
-    static func ------> <U> (_ lhs: Action<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
-        return *lhs ------> rhs
+    static func ---> <U> (_ lhs: Action<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
+        return *lhs ---> rhs
     }
 
-    static func ------> <U> (_ lhs: Step<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
-        return lhs ------> *rhs
+    static func ---> <U> (_ lhs: Step<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
+        return lhs ---> *rhs
     }
 
-    static func ------> <U> (_ lhs: StepChain<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
-        return lhs ------> *rhs
+    static func ---> <U> (_ lhs: StepChain<I, U>, _ rhs: Action<U, O>) -> StepChain<I, O> {
+        return lhs ---> *rhs
     }
 }
 
 protocol AnyStep {}
 
 struct Step<I: Swogicable, O: Swogicable>: AnyStep {
-
     let action: Action<I, O>
 
     init(_ action: Action<I, O>, specific: Bool = false) {
         self.action = action
     }
 
-    static func ------> <U> (_ lhs: Step<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
-        return StepChain(step: lhs) ------> rhs
+    static func ---> <U> (_ lhs: Step<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
+        return StepChain(step: lhs) ---> rhs
+    }
+
+    static func --- (_ step: Step<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
+        return StepChain(step: step) ---> Condition<O>(condition)
     }
 }
 
-protocol AnyStepChain {
+extension Step where O: Equatable {
+    static func --- (_ step: Step<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
+        return StepChain(step: step) ---> MatchCondition<O>(condition)
+    }
 }
 
-extension AnyStepChain {
+internal struct Condition<I>: AnyStep {
+    typealias Literal = (I) -> Bool
+
+    let condition: Literal
+
+    init(_ literal: @escaping Literal) {
+        condition = literal
+    }
+
+    public func evaluate(_ value: I) -> Bool {
+        return condition(value)
+    }
+}
+
+internal struct MatchCondition<I: Equatable>: AnyStep {
+    typealias Literal = () -> I
+
+    let pattern: Literal
+
+    init(_ literal: @escaping Literal) {
+        pattern = literal
+    }
+
+    public func evaluate(_ value: I) -> Bool {
+        if case pattern() = value {
+            return true
+        }
+        return false
+    }
 }
 
 fileprivate indirect enum StepChainDataStructure {
@@ -106,8 +139,18 @@ struct StepChain<I: Swogicable, O: Swogicable> {
         self.stepChainData = stepChainData
     }
 
-    static func ------> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
+    static func ---> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + newStep)
+    }
+
+    static func ---> (_ stepChain: StepChain<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
+        return StepChain(stepChainData: stepChain.stepChainData + condition)
+    }
+}
+
+extension StepChain where O: Equatable {
+    static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
+        return StepChain(stepChainData: stepChain.stepChainData + condition)
     }
 }
 

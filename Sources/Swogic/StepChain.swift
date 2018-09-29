@@ -5,6 +5,9 @@
 //  Created by Ferran Pujol Camins on 03/05/2018.
 //
 
+public protocol AnyStepChainP {}
+public class AnyStepChain<S>: AnyStepChainP {}
+
 fileprivate indirect enum StepChainDataStructure {
     case step(AnyStep)
     case stepChain(StepChainDataStructure, AnyStep)
@@ -24,7 +27,8 @@ fileprivate indirect enum StepChainDataStructure {
     }
 }
 
-public struct StepChain<I, O> {
+// What does copy means for chains? this depends on how chains can be reused
+public class StepChain<I, O>: AnyStepChain<I> {
     private var stepChainData: StepChainDataStructure
 
     internal init(step: AnyStep) {
@@ -35,6 +39,14 @@ public struct StepChain<I, O> {
         self.stepChainData = stepChainData
     }
 
+    public static func --- (_ chain: StepChain<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
+        return chain ---> Condition<O>(condition)
+    }
+
+    public static func --- (_ chain: StepChain<I, O>, _ placeholder: @escaping PlaceHolderCondition<O>.Literal) -> StepChain<I, O> {
+        return chain ---> PlaceHolderCondition<O>.new
+    }
+
     public static func ---> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + newStep)
     }
@@ -42,9 +54,17 @@ public struct StepChain<I, O> {
     public static func ---> (_ stepChain: StepChain<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + condition)
     }
+
+    public static func ---> (_ stepChain: StepChain<I, O>, _ condition: PlaceHolderCondition<O>) -> StepChain<I, O> {
+        return StepChain(stepChainData: stepChain.stepChainData + condition)
+    }
 }
 
 extension StepChain where O: Equatable {
+    public static func --- (_ chain: StepChain<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
+        return chain ---> MatchCondition<O>(condition)
+    }
+
     public static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + condition)
     }

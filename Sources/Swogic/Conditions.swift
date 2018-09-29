@@ -5,6 +5,12 @@
 //  Created by Ferran Pujol Camins on 04/05/2018.
 //
 
+public enum PlaceHolderCondition<I>: AnyStep {
+    public typealias Literal = () -> ()
+
+    case new
+}
+
 public struct Condition<I>: AnyStep {
     public typealias Literal = (I) -> Bool
 

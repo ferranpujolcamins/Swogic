@@ -1,45 +1,27 @@
 // TODO: ADD CI MARKUP TAGS TO README.md
 
+prefix operator =>
 prefix operator *
 infix operator --- : MultiplicationPrecedence
 infix operator ---> : MultiplicationPrecedence
-
-public protocol AnyStep {}
-
-public struct Step<I, O>: AnyStep {
-
-    public init() {
-
-    }
-
-    private var specific: Bool = false;
-
-    public static prefix func * (_ step: Step<I, O>) -> Step<I, O> {
-        var newStep = step;
-        newStep.specific = true;
-        return newStep
-    }
-
-    public static func ---> <U> (_ lhs: Step<I, U>, _ rhs: Step<U, O>) -> StepChain<I, O> {
-        return StepChain(step: lhs) ---> rhs
-    }
-
-    public static func --- (_ step: Step<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
-        return StepChain(step: step) ---> Condition<O>(condition)
-    }
-}
-
-extension Step where O: Equatable {
-    public static func --- (_ step: Step<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
-        return StepChain(step: step) ---> MatchCondition<O>(condition)
-    }
-}
+infix operator ---| : MultiplicationPrecedence
+infix operator |---> : MultiplicationPrecedence
 
 
-// DSL motivated types
+//public func ---> <I,U,O> (_ lhs: @escaping (I)->(U), _ rhs: @escaping (U)->(O)) -> StepChain<I, O> {
+//    return Step(lhs) ---> Step(rhs)
+//}
+//
+//public func --- <I,U,O> (_ lhs: @escaping (I)->(U), _ rhs: @escaping (U)->(O)) -> StepChain<I, O> {
+//    return Step(lhs) ---> Step(rhs)
+//}
 
 
-// v2
+
+
+
+
+// v2: tags?
 /*
 let flow = Flow(
     login ---| .ok   |---> request ---|.ok |---> endAction,

@@ -1,5 +1,3 @@
-// TODO: ADD CI MARKUP TAGS TO README.md
-
 prefix operator =>
 prefix operator *
 infix operator --- : MultiplicationPrecedence

@@ -16,10 +16,10 @@ final class SwogicTests: XCTestCase {
             "Number is: " + String(d)
         }
 
-        Flow<String, Int>(Array<AnyStepChain<String>>(
-            =>step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1,
-                                        step2 ---> *step3
-        ))
+//        Flow<String, Int>(Array<AnyStepChain<String>>(
+//            =>step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1,
+//                                        step2 ---> *step3
+//        ))
     }
 
     func testNew() {

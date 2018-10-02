@@ -1,10 +1,3 @@
-prefix operator =>
-prefix operator *
-infix operator --- : MultiplicationPrecedence
-infix operator ---> : MultiplicationPrecedence
-infix operator ---| : MultiplicationPrecedence
-infix operator |---> : MultiplicationPrecedence
-
 
 //public func ---> <I,U,O> (_ lhs: @escaping (I)->(U), _ rhs: @escaping (U)->(O)) -> StepChain<I, O> {
 //    return Step(lhs) ---> Step(rhs)
@@ -13,9 +6,6 @@ infix operator |---> : MultiplicationPrecedence
 //public func --- <I,U,O> (_ lhs: @escaping (I)->(U), _ rhs: @escaping (U)->(O)) -> StepChain<I, O> {
 //    return Step(lhs) ---> Step(rhs)
 //}
-
-
-
 
 
 

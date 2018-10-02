@@ -5,13 +5,13 @@
 //  Created by Ferran Pujol Camins on 04/05/2018.
 //
 
-public enum PlaceHolderCondition<I>: AnyStep {
+public enum PlaceHolderCondition<I>: Step {
     public typealias Literal = () -> ()
 
     case new
 }
 
-public struct Condition<I>: AnyStep {
+public struct Condition<I>: Step {
     public typealias Literal = (I) -> Bool
 
     private let condition: Literal
@@ -25,7 +25,7 @@ public struct Condition<I>: AnyStep {
     }
 }
 
-public struct MatchCondition<I: Equatable>: AnyStep {
+public struct MatchCondition<I: Equatable>: Step {
     public typealias Literal = () -> I
 
     private let pattern: Literal

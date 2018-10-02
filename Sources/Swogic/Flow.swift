@@ -1,7 +1,8 @@
 import Foundation
+import SwiftGraph
 
 public class Flow<I, O> {
-    init(_ chains: [AnyStepChain<I>]) {
+    public init(_ chains: [StepChain]) {
         
     }
 }

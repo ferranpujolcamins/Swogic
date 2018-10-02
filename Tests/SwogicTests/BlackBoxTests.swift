@@ -1,37 +1,55 @@
 import XCTest
-import Swogic
+@testable import Swogic
 
 // we use this tests, among other things, to test that the access levels set are correct
 final class SwogicTests: XCTestCase {
 
+    let step1 = ExecutionStep<String, Int> { (str) -> Int in
+        str.count
+    }
+    let step2 = ExecutionStep<Int, Double> { (i: Int) -> Double in
+        Double(i) + 3.5
+    }
+    let step3 = ExecutionStep<Double, String> { (d) -> String in
+        "Number is: " + String(d)
+    }
 
-    func testFlow() {
-        let step1 = Step<String, Int> { (str) -> Int in
-            str.count
-        }
-        let step2 = Step<Int, Double> { (i: Int) -> Double in
-            Double(i) + 3.5
-        }
-        let step3 = Step<Double, String> { (d) -> String in
-            "Number is: " + String(d)
-        }
+    func testSingleStepFlow() {
+        _ = Flow<String, Int>([
+            =>step1
+        ])
+    }
 
-//        Flow<String, Int>(Array<AnyStepChain<String>>(
-//            =>step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1,
-//                                        step2 ---> *step3
-//        ))
+    func testMultipleStepFlow() {
+        _ = Flow<String, Int>([
+            =>step1,
+            step2
+        ])
+    }
+
+    func testSingleChainFlow() {
+        _ = Flow<String, Int>([
+            =>step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1
+        ])
+    }
+
+    func testMultipleChainFlow() {
+        _ = Flow<String, Int>([
+            =>step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1,
+                                        step2 ---> *step3
+        ])
     }
 
     func testNew() {
 
         // Actions can be values or class! If value, we add new, if class, we try to match??
-        let step1 = Step<String, Int> { (str) -> Int in
+        let step1 = ExecutionStep<String, Int> { (str) -> Int in
             str.count
         }
-        let step2 = Step<Int, Double> { (i: Int) -> Double in
+        let step2 = ExecutionStep<Int, Double> { (i: Int) -> Double in
             Double(i) + 3.5
         }
-        let step3 = Step<Double, String> { (d) -> String in
+        let step3 = ExecutionStep<Double, String> { (d) -> String in
             "Number is: " + String(d)
         }
 

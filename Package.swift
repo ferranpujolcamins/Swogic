@@ -19,24 +19,9 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "Swogic",
-            dependencies: ["DSL", "Closure", "SwiftGraph"]),
+            dependencies: ["SwiftGraph"]),
         .testTarget(
             name: "SwogicTests",
-            dependencies: ["Swogic"]),
-        .target(
-            name: "DSL",
-            dependencies: ["Domain"]),
-        .testTarget(
-            name: "DSLTests",
-            dependencies: ["DSL"]),
-        .target(
-            name: "Domain",
-            dependencies: []),
-        .target(
-            name: "Closure",
-            dependencies: []),
-        .testTarget(
-            name: "ClosureTests",
-            dependencies: ["Closure"]),
+            dependencies: ["Swogic"])
     ]
 )

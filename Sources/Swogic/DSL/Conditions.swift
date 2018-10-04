@@ -5,16 +5,16 @@
 //  Created by Ferran Pujol Camins on 04/05/2018.
 //
 
-public enum PlaceHolderCondition<I>: ChainElement {
+public enum PlaceHolderCondition: AnyChainElement {
     public typealias Literal = () -> ()
 
     case new
 }
 
-public struct Condition<I>: ChainElement {
+public struct Condition<I>: AnyChainElement {
     public typealias Literal = (I) -> Bool
 
-    private let condition: Literal
+    public let condition: Literal
 
     public init(_ literal: @escaping Literal) {
         condition = literal
@@ -25,10 +25,10 @@ public struct Condition<I>: ChainElement {
     }
 }
 
-public struct MatchCondition<I: Equatable>: ChainElement {
+public struct MatchCondition<I: Equatable>: AnyChainElement {
     public typealias Literal = () -> I
 
-    private let pattern: Literal
+    public let pattern: Literal
 
     public init(_ literal: @escaping Literal) {
         pattern = literal

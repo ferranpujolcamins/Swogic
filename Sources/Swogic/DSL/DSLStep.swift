@@ -1,9 +1,18 @@
 import Domain
-import RuntimeType
+import Closure
 
-public class Step<I, O>: Domain.Step, ChainElement, CustomDebugStringConvertible {
+protocol AnyStep: Domain.Step, AnyChainElement {}
+
+public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
 
     public let closure: (I) -> O
+
+    private var _erasedClosure: (Any) -> Any
+    public var erasedClosure: (Any) -> Any {
+        get {
+            return _erasedClosure
+        }
+    }
 
     private var _name: String = ""
     public var name: String {
@@ -23,6 +32,7 @@ public class Step<I, O>: Domain.Step, ChainElement, CustomDebugStringConvertible
 
     public init(_ closure: @escaping (I) -> O) {
         self.closure = closure
+        self._erasedClosure = Closure.eraseType(closure)
     }
 
     public func copy() -> Step<I, O> {
@@ -45,8 +55,8 @@ public class Step<I, O>: Domain.Step, ChainElement, CustomDebugStringConvertible
         return StepChain(step: step) ---> Condition<O>(condition)
     }
 
-    public static func --- (_ step: Step<I, O>, _ placeholder: @escaping PlaceHolderCondition<O>.Literal) -> StepChain<I, O> {
-        return StepChain(step: step) ---> PlaceHolderCondition<O>.new
+    public static func --- (_ step: Step<I, O>, _ placeholder: @escaping PlaceHolderCondition.Literal) -> StepChain<I, O> {
+        return StepChain(step: step) ---> PlaceHolderCondition.new
     }
 }
 

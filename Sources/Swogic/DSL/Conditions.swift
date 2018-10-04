@@ -5,13 +5,13 @@
 //  Created by Ferran Pujol Camins on 04/05/2018.
 //
 
-public enum PlaceHolderCondition: AnyChainElement {
+public enum PlaceHolderCondition: AnyChainElement, Equatable {
     public typealias Literal = () -> ()
 
     case new
 }
 
-public struct Condition<I>: AnyChainElement {
+public class Condition<I>: AnyChainElement {
     public typealias Literal = (I) -> Bool
 
     public let condition: Literal
@@ -25,7 +25,7 @@ public struct Condition<I>: AnyChainElement {
     }
 }
 
-public struct MatchCondition<I: Equatable>: AnyChainElement {
+public class MatchCondition<I: Equatable>: AnyChainElement {
     public typealias Literal = () -> I
 
     public let pattern: Literal

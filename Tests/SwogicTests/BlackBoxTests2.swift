@@ -14,8 +14,28 @@ final class SwogicTests: XCTestCase {
         "Number is: " + String(d)
     }
 
+    override func setUp() {
+        step1.name = "step1"
+        step2.name = "step2"
+        step3.name = "step3"
+    }
+
     func testMultipleChainFlow() {
-        let a = =>step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1
+        let a = step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1
+    }
+
+    func testGraph() {
+        // Two times the same branch
+        let g1 = Process([
+            step1  --->  step2         ---> step3,
+            step1  --->  step2.copy()  ---> !step3
+        ])
+
+        // Only one branch
+        let g2 = Process([
+            step1  --->  step2  ---> step3,
+            step1  --->  step2  ---> step3
+        ])
     }
 
     static var allTests = [ 3

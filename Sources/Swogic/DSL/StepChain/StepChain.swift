@@ -9,7 +9,7 @@ public protocol AnyChainElement {
 //    var erasedClosure: (Any) -> Any { get }
 }
 
-public enum ChainElement {
+public enum ChainElement: Equatable {
     case step(TypeErasedStep)
     case condition(TypeErasedCondition)
     case placeholderCondition(PlaceHolderCondition)

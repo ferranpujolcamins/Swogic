@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "SwiftGraph",
-        "repositoryURL": "https://github.com/davecom/SwiftGraph",
+        "repositoryURL": "/Users/ferranpujolcamins/development/SwiftGraph",
         "state": {
-          "branch": null,
-          "revision": "c25452230b3747aee78564174382c98c0215e867",
-          "version": "2.0.0"
+          "branch": "Union-improvements",
+          "revision": "02277b5889b23b8fd8fe6a03b6479f7ff28bc6d2",
+          "version": null
         }
       }
     ]

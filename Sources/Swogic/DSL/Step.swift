@@ -39,11 +39,7 @@ public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
         return Step<I, O>(closure)
     }
 
-    public static prefix func => (_ step: Step<I, O>) -> Step<I, O> {
-        return step
-    }
-
-    public static prefix func * (_ step: Step<I, O>) -> Step<I, O> {
+    public static prefix func ! (_ step: Step<I, O>) -> Step<I, O> {
         return step.copy()
     }
 

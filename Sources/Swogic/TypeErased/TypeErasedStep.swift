@@ -1,4 +1,4 @@
-public class TypeErasedStep: DomainStep, HashableRepresentative, CustomDebugStringConvertible {
+public class TypeErasedStep: HashableRepresentative, CustomDebugStringConvertible {
     var representee: AnyObject
 
     public var name: String

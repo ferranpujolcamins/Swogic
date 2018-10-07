@@ -1,23 +1,10 @@
-//
-//  Conditions.swift
-//  Swogic
-//
-//  Created by Ferran Pujol Camins on 04/05/2018.
-//
-
-public enum PlaceHolderCondition: AnyChainElement, Equatable {
+public enum PlaceHolderCondition: Equatable {
     public typealias Literal = () -> ()
 
     case new
 }
 
-public class Condition<I>: DomainCondition, AnyChainElement, CustomDebugStringConvertible {
-    public var debugDescription: String {
-        get {
-            return name
-        }
-    }
-
+public final class Condition<I>: Nameable, CustomDebugStringConvertible {
     public var name: String = ""
 
     public typealias Literal = (I) -> Bool
@@ -33,13 +20,7 @@ public class Condition<I>: DomainCondition, AnyChainElement, CustomDebugStringCo
     }
 }
 
-public class MatchCondition<I: Equatable>: DomainMatchCondition, AnyChainElement, CustomDebugStringConvertible {
-    public var debugDescription: String {
-        get {
-            return name
-        }
-    }
-    
+public final class MatchCondition<I: Equatable>: Nameable, CustomDebugStringConvertible {
     public var name: String = ""
 
     public typealias Literal = () -> I

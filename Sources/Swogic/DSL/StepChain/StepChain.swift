@@ -1,7 +1,3 @@
-public protocol AnyChainElement {
-//    var erasedClosure: (Any) -> Any { get }
-}
-
 public enum ChainElement: Hashable {
     case step(TypeErasedStep)
     case condition(TypeErasedCondition)
@@ -50,7 +46,7 @@ internal indirect enum StepChainDataStructure {
 
 // What does copy means for chains? this depends on how chains can be reused
 // Shall they be a struct?
-public class StepChain<I, O> {
+public final class StepChain<I, O> {
 
     internal var stepChainData: StepChainDataStructure
 

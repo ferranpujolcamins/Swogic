@@ -1,6 +1,4 @@
-protocol AnyStep: DomainStep, AnyChainElement {}
-
-public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
+public final class Step<I, O>: Nameable {
 
     public let closure: (I) -> O
 
@@ -21,19 +19,9 @@ public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
         }
     }
 
-    public var debugDescription: String {
-        get {
-            return name
-        }
-    }
-
     public init(_ closure: @escaping (I) -> O) {
         self.closure = closure
         self._erasedClosure = eraseType(closure)
-    }
-
-    public func copy() -> Step<I, O> {
-        return Step<I, O>(closure)
     }
 
     public static prefix func ! (_ step: Step<I, O>) -> Step<I, O> {

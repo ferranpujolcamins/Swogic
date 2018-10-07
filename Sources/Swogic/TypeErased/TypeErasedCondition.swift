@@ -1,4 +1,4 @@
-public class TypeErasedCondition: DomainCondition, HashableRepresentative, CustomDebugStringConvertible {
+public class TypeErasedCondition: HashableRepresentative, CustomDebugStringConvertible {
     public var name: String = ""
 
     var representee: AnyObject
@@ -21,7 +21,7 @@ public class TypeErasedCondition: DomainCondition, HashableRepresentative, Custo
     }
 }
 
-public class TypeErasedMatchCondition: DomainMatchCondition, HashableRepresentative, CustomDebugStringConvertible {
+public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugStringConvertible {
     public var name: String = ""
 
     var representee: AnyObject

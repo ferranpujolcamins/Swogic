@@ -21,14 +21,6 @@ internal indirect enum StepChainDataStructure {
         self.init(.step(TypeErasedStep(from: step)))
     }
 
-//    public init<I>(_ condition: Condition<I>) {
-//        self.init(.condition(TypeErasedCondition(from: condition)))
-//    }
-//
-//    public init<I>(_ condition: MatchCondition<I>) {
-//        self.init(.matchCondition(TypeErasedMatchCondition(from: condition)))
-//    }
-
     public static func + (_ chain: StepChainDataStructure, _ newStep: ChainElement) -> StepChainDataStructure {
         switch chain {
         case .step(let step):

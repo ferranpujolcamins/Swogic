@@ -1,5 +1,7 @@
 extension Step: Copyable {
     public func copy() -> Step<I, O> {
-        return Step<I, O>(closure)
+        let step = Step<I, O>(closure)
+        step.name = name
+        return step
     }
 }

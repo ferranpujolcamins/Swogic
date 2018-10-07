@@ -1,10 +1,10 @@
 import SwiftGraph
 
 public class Process<I, O> {
-    let graph: UniqueElementsGraph<ChainElement>
-    let dfs: DFS<UniqueElementsGraph<ChainElement>>
-    let initialElement: ChainElement
-    init(_ chains: [StepChain<I, O>]) {
+    private let graph: UniqueElementsGraph<ChainElement>
+    private let initialElement: ChainElement
+    private let dfs: DFS<UniqueElementsGraph<ChainElement>>
+    public init(_ chains: [StepChain<I, O>]) {
         let chains = chains.map({Array($0)})
         let graphs = chains.map({ UniqueElementsGraph<ChainElement>(withPath: $0, directed: true)})
 
@@ -18,7 +18,9 @@ public class Process<I, O> {
         dfs = DFS(on: graph) //set order
     }
 
-    func evaluate(_ p: I) -> O? {
+    public var evaluationLog = ""
+
+    public func evaluate(_ p: I) -> O? {
         var evaluations = Dictionary<ChainElement, Any>()
 
         var firstFinalResult: Any? = nil
@@ -32,13 +34,14 @@ public class Process<I, O> {
         if ( graph.edgesForIndex(initialIndex).count == 0 && firstFinalResult == nil) {
             firstFinalResult = partialResult
         }
+        evaluationLog = initialStep.debugDescription
 
         // TODO: use the return value to know the first finalResults
         dfs.from(initialIndex, goalTest: { _ in false }, reducer: { (edge) -> Bool in
 
             let prevElement = graph.vertexAtIndex(edge.u)
             let element = graph.vertexAtIndex(edge.v)
-
+            logStep(prevElement: prevElement, element: element)
             switch element {
 
             case .step(let step):
@@ -61,9 +64,28 @@ public class Process<I, O> {
             case .placeholderCondition(_):
                 break
             }
-            print(evaluations)
             return true
         })
         return firstFinalResult.flatMap({ $0 as? O})
+    }
+
+    private func logStep(prevElement: ChainElement, element: ChainElement) {
+        switch (prevElement, element) {
+
+        case (_, .step(let step)):
+            evaluationLog += " ---> "
+            evaluationLog += step.debugDescription
+
+        case (.step, .condition(let condition)):
+            evaluationLog += " --- "
+            evaluationLog += "{"+condition.debugDescription+"}"
+
+        case (.step, .matchCondition(let condition)):
+            evaluationLog += " --- "
+            evaluationLog += "{"+condition.debugDescription+"}"
+
+        case (_, _):
+            break
+        }
     }
 }

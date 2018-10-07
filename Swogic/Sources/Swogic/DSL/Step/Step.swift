@@ -56,7 +56,7 @@ extension Step where O: Equatable {
 }
 
 extension String {
-    static func ~ <I, O> (_ closure: @escaping (I)->O, _ name: String) -> Step<I, O> {
+    public static func ~ <I, O> (_ closure: @escaping (I)->O, _ name: String) -> Step<I, O> {
         let step = Step(closure)
         step.name = name
         return step

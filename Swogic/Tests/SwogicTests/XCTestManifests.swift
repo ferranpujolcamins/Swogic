@@ -17,6 +17,12 @@ extension CollectionTests {
     ]
 }
 
+extension ProcessTests {
+    static let __allTests = [
+        ("testVoidProcess", testVoidProcess),
+    ]
+}
+
 extension StepChainSequenceTests {
     static let __allTests = [
         ("testIterator", testIterator),
@@ -27,8 +33,6 @@ extension SwogicTests {
     static let __allTests = [
         ("testDoubleBranch", testDoubleBranch),
         ("testFlow2", testFlow2),
-        ("testGraph", testGraph),
-        ("testMultipleChainFlow", testMultipleChainFlow),
         ("testProcessWithCondition", testProcessWithCondition),
         ("testSingleBranchStatedTwice", testSingleBranchStatedTwice),
         ("testTwoLeafs", testTwoLeafs),
@@ -40,6 +44,7 @@ public func __allTests() -> [XCTestCaseEntry] {
     return [
         testCase(ClosureTests.__allTests),
         testCase(CollectionTests.__allTests),
+        testCase(ProcessTests.__allTests),
         testCase(StepChainSequenceTests.__allTests),
         testCase(SwogicTests.__allTests),
     ]

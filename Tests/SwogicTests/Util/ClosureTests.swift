@@ -21,9 +21,4 @@ final class ClosureTests: XCTestCase {
 
         XCTAssertEqual(result as? Int ?? -1, 0)
     }
-
-    static var allTests = [
-        ("testEquivalence", testEquivalence),
-        ("testComposability", testComposability),
-    ]
 }

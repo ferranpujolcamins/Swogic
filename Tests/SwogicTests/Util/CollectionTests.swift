@@ -32,9 +32,4 @@ final class CollectionTests: XCTestCase {
         let uniqueElement = collection.uniqueElement
         XCTAssertEqual(uniqueElement, .some(1),"uniqueElement of an homogeneous collection should return the unique element")
     }
-
-    static var allTests = [
-        ("testEmptyCollection", testEmptyCollection),
-        ("testHeterogeneousCollection1", testHeterogeneousCollection1),
-    ]
 }

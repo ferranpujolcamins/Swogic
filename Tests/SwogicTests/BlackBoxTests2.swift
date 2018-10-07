@@ -111,8 +111,4 @@ final class SwogicTests: XCTestCase {
 //        let result2: String? = process.evaluate("ab")
 //        XCTAssertEqual(result2!, "Number is: 5.5")
     }
-
-    static var allTests = [ 3
-//        ("testNew", testNew),
-    ]
 }

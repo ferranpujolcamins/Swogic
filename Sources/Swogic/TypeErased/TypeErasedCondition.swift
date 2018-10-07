@@ -1,4 +1,6 @@
-public class TypeErasedCondition: DomainCondition, EquatableRepresentative {
+public class TypeErasedCondition: DomainCondition, HashableRepresentative, CustomDebugStringConvertible {
+    public var name: String = ""
+
     var representee: AnyObject
 
     let closure: (Any) -> Any
@@ -7,9 +9,21 @@ public class TypeErasedCondition: DomainCondition, EquatableRepresentative {
         closure = eraseType(dslCondition.condition)
         representee = dslCondition
     }
+
+    public var debugDescription: String {
+        get {
+            if let representee = representee as? CustomDebugStringConvertible {
+                return representee.debugDescription
+            } else {
+                return ""
+            }
+        }
+    }
 }
 
-public class TypeErasedMatchCondition: DomainMatchCondition, EquatableRepresentative {
+public class TypeErasedMatchCondition: DomainMatchCondition, HashableRepresentative, CustomDebugStringConvertible {
+    public var name: String = ""
+
     var representee: AnyObject
 
     let closure: (Any) -> Any
@@ -17,5 +31,15 @@ public class TypeErasedMatchCondition: DomainMatchCondition, EquatableRepresenta
     init<I>(from dslCondition: MatchCondition<I>) {
         closure = eraseType(dslCondition.pattern)
         representee = dslCondition
+    }
+
+    public var debugDescription: String {
+        get {
+            if let representee = representee as? CustomDebugStringConvertible {
+                return representee.debugDescription
+            } else {
+                return ""
+            }
+        }
     }
 }

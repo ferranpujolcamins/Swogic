@@ -1,15 +1,8 @@
-//
-//  StepChain.swift
-//  SwiftGraph
-//
-//  Created by Ferran Pujol Camins on 03/05/2018.
-//
-
 public protocol AnyChainElement {
 //    var erasedClosure: (Any) -> Any { get }
 }
 
-public enum ChainElement: Equatable {
+public enum ChainElement: Hashable {
     case step(TypeErasedStep)
     case condition(TypeErasedCondition)
     case placeholderCondition(PlaceHolderCondition)

@@ -1,7 +1,4 @@
-import Domain
-import Closure
-
-protocol AnyStep: Domain.Step, AnyChainElement {}
+protocol AnyStep: DomainStep, AnyChainElement {}
 
 public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
 
@@ -32,7 +29,7 @@ public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
 
     public init(_ closure: @escaping (I) -> O) {
         self.closure = closure
-        self._erasedClosure = Closure.eraseType(closure)
+        self._erasedClosure = eraseType(closure)
     }
 
     public func copy() -> Step<I, O> {
@@ -51,6 +48,10 @@ public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
         return StepChain(step: step) ---> Condition<O>(condition)
     }
 
+    public static func --- (_ step: Step<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
+        return StepChain(step: step) ---> condition
+    }
+
     public static func --- (_ step: Step<I, O>, _ placeholder: @escaping PlaceHolderCondition.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> PlaceHolderCondition.new
     }
@@ -59,5 +60,17 @@ public class Step<I, O>: AnyStep, CustomDebugStringConvertible {
 extension Step where O: Equatable {
     public static func --- (_ step: Step<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> MatchCondition<O>(condition)
+    }
+
+    public static func --- (_ step: Step<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
+        return StepChain(step: step) ---> condition
+    }
+}
+
+extension String {
+    static func ~ <I, O> (_ closure: @escaping (I)->O, _ name: String) -> Step<I, O> {
+        let step = Step(closure)
+        step.name = name
+        return step
     }
 }

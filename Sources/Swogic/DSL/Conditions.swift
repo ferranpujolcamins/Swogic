@@ -11,7 +11,15 @@ public enum PlaceHolderCondition: AnyChainElement, Equatable {
     case new
 }
 
-public class Condition<I>: AnyChainElement {
+public class Condition<I>: DomainCondition, AnyChainElement, CustomDebugStringConvertible {
+    public var debugDescription: String {
+        get {
+            return name
+        }
+    }
+
+    public var name: String = ""
+
     public typealias Literal = (I) -> Bool
 
     public let condition: Literal
@@ -25,7 +33,15 @@ public class Condition<I>: AnyChainElement {
     }
 }
 
-public class MatchCondition<I: Equatable>: AnyChainElement {
+public class MatchCondition<I: Equatable>: DomainMatchCondition, AnyChainElement, CustomDebugStringConvertible {
+    public var debugDescription: String {
+        get {
+            return name
+        }
+    }
+    
+    public var name: String = ""
+
     public typealias Literal = () -> I
 
     public let pattern: Literal
@@ -39,5 +55,19 @@ public class MatchCondition<I: Equatable>: AnyChainElement {
             return true
         }
         return false
+    }
+}
+
+extension String {
+    static func ~ <I> (_ literal: @escaping Condition<I>.Literal, _ name: String) -> Condition<I> {
+        let condition = Condition(literal)
+        condition.name = name
+        return condition
+    }
+
+    static func ~ <I> (_ literal: @escaping MatchCondition<I>.Literal, _ name: String) -> MatchCondition<I> {
+        let condition = MatchCondition(literal)
+        condition.name = name
+        return condition
     }
 }

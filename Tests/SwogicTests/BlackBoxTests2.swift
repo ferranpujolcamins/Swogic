@@ -29,7 +29,7 @@ final class SwogicTests: XCTestCase {
             self.state.append("true")
             return true
         })
-        doubleToTrue = Step<Double, Bool>({_ in
+        doubleToFalse = Step<Double, Bool>({_ in
             self.state.append("false")
             return false
         })

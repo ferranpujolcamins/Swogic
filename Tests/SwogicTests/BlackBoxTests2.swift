@@ -81,6 +81,16 @@ final class SwogicTests: XCTestCase {
         XCTAssertEqual(state, ["s1", "s2", "s3"])
     }
 
+    func testDoubleBranch() {
+        let process = Swogic.Process([
+            step1 ---> step2 ---> step3,
+            step1 ---> !step2 ---> !step3
+            ])
+        let result: String? = process.evaluate("Ferran")
+        XCTAssertEqual(result!, "Number is: 9.5")
+        XCTAssertEqual(state, ["s1", "s2", "s3", "s2", "s3"])
+    }
+
     func testTwoLeafs() {
 
         let process = Swogic.Process([

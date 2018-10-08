@@ -20,10 +20,10 @@ extension CollectionTests {
 extension ProcessTests {
     static let __allTests = [
         ("testDoubleBranch", testDoubleBranch),
-        ("testFlow2", testFlow2),
         ("testProcessWithCondition", testProcessWithCondition),
         ("testSingleBranchStatedTwice", testSingleBranchStatedTwice),
         ("testTwoLeafs", testTwoLeafs),
+        ("testTwoLeafsWithCondition", testTwoLeafsWithCondition),
         ("testVoidProcess", testVoidProcess),
     ]
 }

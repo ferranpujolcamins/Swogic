@@ -20,7 +20,7 @@ final class ProcessTests: XCTestCase {
         } ~ "f"
 
     func testProcessWithCondition() {
-        let process = Swogic.Process([step1 --- { $0 > 2 }~"Greater than 2" ---> step2 ---> step3])
+        let process = Process([step1 --- { $0 > 2 }~"Greater than 2" ---> step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         XCTAssertEqual(process.evaluationLog, "s1 --- {Greater than 2} ---> s2 ---> s3")
@@ -31,7 +31,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testSingleBranchStatedTwice() {
-        let process = Swogic.Process([
+        let process = Process([
             step1 ---> step2 ---> step3,
             step1 ---> step2 ---> step3
             ])
@@ -41,7 +41,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testDoubleBranch() {
-        let process = Swogic.Process([
+        let process = Process([
             step1 ---> step2 ---> step3,
             step1 ---> !step2 ---> !step3
             ])
@@ -53,7 +53,7 @@ final class ProcessTests: XCTestCase {
 
     func testTwoLeafs() {
 
-        let process = Swogic.Process([
+        let process = Process([
             step1 ---> step2 ---> doubleToTrue,
             step1 ---> step2 ---> doubleToFalse
             ])
@@ -63,7 +63,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testTwoLeafsWithCondition() {
-        let process = Swogic.Process([step1 --- { $0 > 2 }~"Great" ---> step2 ---> step3,
+        let process = Process([step1 --- { $0 > 2 }~"Great" ---> step2 ---> step3,
                                       step1 --- { $0 <= 2 }~"LessEq" ---> !step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
@@ -73,6 +73,19 @@ final class ProcessTests: XCTestCase {
         let result2: String? = process.evaluate("ab")
         XCTAssertEqual(result2!, "Number is: 5.5")
         XCTAssertEqual(process.evaluationLog, "s1 --- {Great} --- {LessEq} ---> s2 ---> s3")
+    }
+
+    func testMatchCondition() {
+        let process = Process([step1 --- { 3 }~"is 3" ---> step2])
+
+        let result1 = process.evaluate("abc")
+        XCTAssertEqual(result1, 6.5)
+        XCTAssertEqual(process.evaluationLog, "s1 --- {is 3} ---> s2")
+
+        let result2 = process.evaluate("ab")
+        XCTAssertNil(result2)
+        XCTAssertEqual(process.evaluationLog, "s1 --- {is 3}")
+
     }
 
     var stepVoid1: Step<(), Int> = { () -> Int in

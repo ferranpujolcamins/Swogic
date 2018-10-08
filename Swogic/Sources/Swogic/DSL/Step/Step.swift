@@ -45,7 +45,7 @@ public final class Step<I, O>: Nameable {
     }
 }
 
-extension Step where O: Equatable {
+extension Step where O: EquatableToAny {
     public static func --- (_ step: Step<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> MatchCondition<O>(condition)
     }

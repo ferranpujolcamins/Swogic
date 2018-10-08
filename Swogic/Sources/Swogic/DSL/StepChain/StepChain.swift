@@ -79,7 +79,7 @@ public final class StepChain<I, O> {
     }
 }
 
-extension StepChain where O: Equatable {
+extension StepChain where O: EquatableToAny {
     public static func --- (_ chain: StepChain<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
         return chain ---> MatchCondition<O>(condition)
     }

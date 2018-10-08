@@ -14,13 +14,9 @@ public final class Condition<I>: Nameable, CustomDebugStringConvertible {
     public init(_ literal: @escaping Literal) {
         condition = literal
     }
-
-    public func evaluate(_ value: I) -> Bool {
-        return condition(value)
-    }
 }
 
-public final class MatchCondition<I: Equatable>: Nameable, CustomDebugStringConvertible {
+public final class MatchCondition<I: EquatableToAny>: Nameable, CustomDebugStringConvertible {
     public var name: String = ""
 
     public typealias Literal = () -> I
@@ -29,13 +25,6 @@ public final class MatchCondition<I: Equatable>: Nameable, CustomDebugStringConv
 
     public init(_ literal: @escaping Literal) {
         pattern = literal
-    }
-
-    public func evaluate(_ value: I) -> Bool {
-        if case pattern() = value {
-            return true
-        }
-        return false
     }
 }
 

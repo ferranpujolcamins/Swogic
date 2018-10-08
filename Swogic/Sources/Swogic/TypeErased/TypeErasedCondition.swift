@@ -3,7 +3,7 @@ public class TypeErasedCondition: HashableRepresentative, CustomDebugStringConve
 
     var representee: AnyObject
 
-    let closure: (Any) -> Any
+    private let closure: (Any) -> Any
 
     init<I>(from dslCondition: Condition<I>) {
         closure = eraseType(dslCondition.condition)
@@ -19,6 +19,10 @@ public class TypeErasedCondition: HashableRepresentative, CustomDebugStringConve
             }
         }
     }
+    
+    public func evaluate(_ value: Any) -> Bool {
+        return closure(value) as! Bool
+    }
 }
 
 public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugStringConvertible {
@@ -26,7 +30,7 @@ public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugString
 
     var representee: AnyObject
 
-    let closure: (Any) -> Any
+    private let closure: (Any) -> Any
 
     init<I>(from dslCondition: MatchCondition<I>) {
         closure = eraseType(dslCondition.pattern)
@@ -41,5 +45,10 @@ public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugString
                 return ""
             }
         }
+    }
+
+    public func evaluate(_ value: Any) -> Bool {
+
+        return (closure(()) as! EquatableToAny).isEqual(to: value)
     }
 }

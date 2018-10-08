@@ -54,12 +54,12 @@ public class Process<I, O> {
             case .condition(let condition):
                 let p = evaluations[prevElement]!
                 evaluations[element] = p
-                return condition.closure(p) as? Bool ?? false
+                return condition.evaluate(p)
 
             case .matchCondition(let condition):
                 let p = evaluations[prevElement]!
                 evaluations[element] = p
-                return condition.closure(p) as? Bool ?? false
+                return condition.evaluate(p)
 
             case .placeholderCondition(_):
                 break

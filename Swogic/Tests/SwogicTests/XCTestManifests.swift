@@ -19,6 +19,11 @@ extension CollectionTests {
 
 extension ProcessTests {
     static let __allTests = [
+        ("testDoubleBranch", testDoubleBranch),
+        ("testFlow2", testFlow2),
+        ("testProcessWithCondition", testProcessWithCondition),
+        ("testSingleBranchStatedTwice", testSingleBranchStatedTwice),
+        ("testTwoLeafs", testTwoLeafs),
         ("testVoidProcess", testVoidProcess),
     ]
 }
@@ -29,16 +34,6 @@ extension StepChainSequenceTests {
     ]
 }
 
-extension SwogicTests {
-    static let __allTests = [
-        ("testDoubleBranch", testDoubleBranch),
-        ("testFlow2", testFlow2),
-        ("testProcessWithCondition", testProcessWithCondition),
-        ("testSingleBranchStatedTwice", testSingleBranchStatedTwice),
-        ("testTwoLeafs", testTwoLeafs),
-    ]
-}
-
 #if !os(macOS)
 public func __allTests() -> [XCTestCaseEntry] {
     return [
@@ -46,7 +41,6 @@ public func __allTests() -> [XCTestCaseEntry] {
         testCase(CollectionTests.__allTests),
         testCase(ProcessTests.__allTests),
         testCase(StepChainSequenceTests.__allTests),
-        testCase(SwogicTests.__allTests),
     ]
 }
 #endif

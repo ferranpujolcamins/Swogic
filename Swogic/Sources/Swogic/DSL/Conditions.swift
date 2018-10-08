@@ -40,13 +40,13 @@ public final class MatchCondition<I: Equatable>: Nameable, CustomDebugStringConv
 }
 
 extension String {
-    static func ~ <I> (_ literal: @escaping Condition<I>.Literal, _ name: String) -> Condition<I> {
+    public static func ~ <I> (_ literal: @escaping Condition<I>.Literal, _ name: String) -> Condition<I> {
         let condition = Condition(literal)
         condition.name = name
         return condition
     }
 
-    static func ~ <I> (_ literal: @escaping MatchCondition<I>.Literal, _ name: String) -> MatchCondition<I> {
+    public static func ~ <I> (_ literal: @escaping MatchCondition<I>.Literal, _ name: String) -> MatchCondition<I> {
         let condition = MatchCondition(literal)
         condition.name = name
         return condition

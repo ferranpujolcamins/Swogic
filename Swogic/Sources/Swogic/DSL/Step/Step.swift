@@ -55,6 +55,16 @@ extension Step where O: EquatableToAny {
     }
 }
 
+extension Step {
+    var consume: Step<O, Void> {
+        return Step<O, Void>({_ in })
+    }
+
+    func replace<U>(by value: U) -> Step<O, U> {
+        return Step<O, U>({ _ in value})
+    }
+}
+
 extension String {
     public static func ~ <I, O> (_ closure: @escaping (I)->O, _ name: String) -> Step<I, O> {
         let step = Step(closure)

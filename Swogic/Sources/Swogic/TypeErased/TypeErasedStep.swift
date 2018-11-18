@@ -24,8 +24,6 @@ public class TypeErasedStep: HashableRepresentative, CustomDebugStringConvertibl
 
 
 protocol HashableRepresentative: Hashable {
-    static func == (lhs: Self, rhs: Self) -> Bool
-
     var representee: AnyObject { get };
 }
 

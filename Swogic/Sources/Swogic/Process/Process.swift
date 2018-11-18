@@ -34,8 +34,7 @@ public class Process<I, O> {
         }
         evaluationLog = initialStep.debugDescription
 
-        // TODO: use the return value to know the first finalResults
-        graph.dfs(fromIndex: initialIndex,
+        _ = graph.dfs(fromIndex: initialIndex,
                   goalTest: { _ in false },
                   visitOrder: { $0.reversed() },
                   reducer: { (edge) -> Bool in
@@ -48,7 +47,7 @@ public class Process<I, O> {
             case .step(let step):
                 let partialResult = step.closure(evaluations[prevElement]!)
                 evaluations[element] = partialResult
-                if ( graph.edgesForIndex(edge.v).count == 0 && firstFinalResult == nil) {
+                if (graph.edgesForIndex(edge.v).count == 0 && firstFinalResult == nil) {
                     firstFinalResult = partialResult
                 }
 

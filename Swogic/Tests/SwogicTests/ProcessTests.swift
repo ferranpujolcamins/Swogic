@@ -42,12 +42,12 @@ final class ProcessTests: XCTestCase {
 
     func testDoubleBranch() {
         let process = Process([
-            step1 ---> step2 ---> step3,
+            step1 --->  step2 --->  step3,
             step1 ---> !step2 ---> !step3
-            ])
+        ])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
-        // TODO: this log is not accurate because it does not take into account the stack structure
+        // TODO: this log is not nice (we miss linebreaks) because it does not take into account the stack structure
         XCTAssertEqual(process.evaluationLog, "s1 ---> s2 ---> s3 ---> s2 ---> s3")
     }
 
@@ -63,8 +63,8 @@ final class ProcessTests: XCTestCase {
     }
 
     func testTwoLeafsWithCondition() {
-        let process = Process([step1 --- { $0 > 2 }~"Great" ---> step2 ---> step3,
-                                      step1 --- { $0 <= 2 }~"LessEq" ---> !step2 ---> step3])
+        let process = Process([step1 --- { $0 >  2 }~"Great"  --->  step2 ---> step3,
+                               step1 --- { $0 <= 2 }~"LessEq" ---> !step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         // TODO: On the evaluation log, we cannot distinguish s2 from its copy !s2

@@ -3,7 +3,6 @@ import SwiftGraph
 public class Process<I, O> {
     private let graph: UniqueElementsGraph<ChainElement>
     private let initialElement: ChainElement
-    private let dfs: DFS<UniqueElementsGraph<ChainElement>>
     public init(_ chains: [StepChain<I, O>]) {
         let chains = chains.map({Array($0)})
         let graphs = chains.map({ UniqueElementsGraph<ChainElement>(withPath: $0, directed: true)})
@@ -15,7 +14,6 @@ public class Process<I, O> {
         self.initialElement = initialStep
 
         graph = UniqueElementsGraph(unionOf: graphs)
-        dfs = DFS(on: graph) //set order
     }
 
     public var evaluationLog = ""
@@ -37,7 +35,10 @@ public class Process<I, O> {
         evaluationLog = initialStep.debugDescription
 
         // TODO: use the return value to know the first finalResults
-        dfs.from(initialIndex, goalTest: { _ in false }, reducer: { (edge) -> Bool in
+        graph.dfs(fromIndex: initialIndex,
+                  goalTest: { _ in false },
+                  visitOrder: { $0.reversed() },
+                  reducer: { (edge) -> Bool in
 
             let prevElement = graph.vertexAtIndex(edge.u)
             let element = graph.vertexAtIndex(edge.v)

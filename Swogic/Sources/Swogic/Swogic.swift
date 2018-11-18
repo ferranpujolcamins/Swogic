@@ -3,7 +3,7 @@
 //    return Step(lhs) ---> Step(rhs)
 //}
 //
-//public func --- <I,U,O> (_ lhs: @escaping (I)->(U), _ rhs: @escaping (U)->(O)) -> StepChain<I, O> {
+//public func ---- <I,U,O> (_ lhs: @escaping (I)->(U), _ rhs: @escaping (U)->(O)) -> StepChain<I, O> {
 //    return Step(lhs) ---> Step(rhs)
 //}
 

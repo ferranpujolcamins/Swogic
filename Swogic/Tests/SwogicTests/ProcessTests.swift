@@ -20,14 +20,14 @@ final class ProcessTests: XCTestCase {
         } ~ "f"
 
     func testProcessWithCondition() {
-        let process = Process([step1 --- { $0 > 2 }~"Greater than 2" ---> step2 ---> step3])
+        let process = Process([step1 ---- { $0 > 2 }~"Greater than 2" ---> step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
-        XCTAssertEqual(process.evaluationLog, "s1 --- {Greater than 2} ---> s2 ---> s3")
+        XCTAssertEqual(process.evaluationLog, "s1 ---- {Greater than 2} ---> s2 ---> s3")
 
         let result2: String? = process.evaluate("ab")
         XCTAssertNil(result2)
-        XCTAssertEqual(process.evaluationLog, "s1 --- {Greater than 2}")
+        XCTAssertEqual(process.evaluationLog, "s1 ---- {Greater than 2}")
     }
 
     func testSingleBranchStatedTwice() {
@@ -48,7 +48,11 @@ final class ProcessTests: XCTestCase {
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         // TODO: this log is not nice (we miss linebreaks) because it does not take into account the stack structure
-        XCTAssertEqual(process.evaluationLog, "s1 ---> s2 ---> s3 ---> s2 ---> s3")
+        print(process.evaluationLog)
+        XCTAssertEqual(process.evaluationLog, """
+        s1 ---> s2 ---> s3
+           ---> s2 ---> s3
+        """)
     }
 
     func testTwoLeafs() {
@@ -59,32 +63,41 @@ final class ProcessTests: XCTestCase {
             ])
         let result = process.evaluate("h")
         XCTAssertEqual(result!, true)
-        XCTAssertEqual(process.evaluationLog, "s1 ---> s2 ---> t ---> f")
+        XCTAssertEqual(process.evaluationLog, """
+        s1 ---> s2 ---> t
+                   ---> f
+        """)
     }
 
     func testTwoLeafsWithCondition() {
-        let process = Process([step1 --- { $0 >  2 }~"Great"  --->  step2 ---> step3,
-                               step1 --- { $0 <= 2 }~"LessEq" ---> !step2 ---> step3])
+        let process = Process([step1 ---- { $0 >  2 }~"Great"  --->  step2 ---> step3,
+                               step1 ---- { $0 <= 2 }~"LessEq" ---> !step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         // TODO: On the evaluation log, we cannot distinguish s2 from its copy !s2
-        XCTAssertEqual(process.evaluationLog, "s1 --- {Great} ---> s2 ---> s3 --- {LessEq}")
+        XCTAssertEqual(process.evaluationLog, """
+        s1 ---- {Great} ---> s2 ---> s3
+           ---- {LessEq}
+        """)
 
         let result2: String? = process.evaluate("ab")
         XCTAssertEqual(result2!, "Number is: 5.5")
-        XCTAssertEqual(process.evaluationLog, "s1 --- {Great} --- {LessEq} ---> s2 ---> s3")
+        XCTAssertEqual(process.evaluationLog, """
+        s1 ---- {Great}
+           ---- {LessEq} ---> s2 ---> s3
+        """)
     }
 
     func testMatchCondition() {
-        let process = Process([step1 --- { 3 }~"is 3" ---> step2])
+        let process = Process([step1 ---- { 3 }~"is 3" ---> step2])
 
         let result1 = process.evaluate("abc")
         XCTAssertEqual(result1, 6.5)
-        XCTAssertEqual(process.evaluationLog, "s1 --- {is 3} ---> s2")
+        XCTAssertEqual(process.evaluationLog, "s1 ---- {is 3} ---> s2")
 
         let result2 = process.evaluate("ab")
         XCTAssertNil(result2)
-        XCTAssertEqual(process.evaluationLog, "s1 --- {is 3}")
+        XCTAssertEqual(process.evaluationLog, "s1 ---- {is 3}")
 
     }
 
@@ -100,9 +113,9 @@ final class ProcessTests: XCTestCase {
 
     func testVoidProcess() {
         let process = Swogic.Process<(), ()>([
-            stepVoid1 ---> stepVoid2 --- { _ in true } ---> stepVoid3
+            stepVoid1 ---> stepVoid2 ---- { _ in true } ---> stepVoid3
         ])
         _ = process.evaluate(())
-        XCTAssertEqual(process.evaluationLog, "s1 ---> s2 --- {} ---> s3")
+        XCTAssertEqual(process.evaluationLog, "s1 ---> s2 ---- {} ---> s3")
     }
 }

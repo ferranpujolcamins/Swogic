@@ -1,8 +1,22 @@
-public enum ChainElement: Hashable {
+public enum ChainElement: Hashable, CustomDebugStringConvertible {
     case step(TypeErasedStep)
     case condition(TypeErasedCondition)
     case placeholderCondition(PlaceHolderCondition)
     case matchCondition(TypeErasedMatchCondition)
+
+    public var debugDescription: String {
+        switch self {
+
+        case .step(let step):
+            return step.debugDescription
+        case .condition(let condition):
+            return condition.debugDescription
+        case .placeholderCondition(_):
+            return ""
+        case .matchCondition(let condition):
+            return condition.debugDescription
+        }
+    }
 }
 
 internal indirect enum StepChainDataStructure {
@@ -58,11 +72,11 @@ public final class StepChain<I, O> {
         self.stepChainData = stepChainData
     }
 
-    public static func --- (_ chain: StepChain<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
+    public static func ---- (_ chain: StepChain<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
         return chain ---> Condition<O>(condition)
     }
 
-    public static func --- (_ chain: StepChain<I, O>, _ placeholder: @escaping PlaceHolderCondition.Literal) -> StepChain<I, O> {
+    public static func ---- (_ chain: StepChain<I, O>, _ placeholder: @escaping PlaceHolderCondition.Literal) -> StepChain<I, O> {
         return chain ---> PlaceHolderCondition.new
     }
 
@@ -80,7 +94,7 @@ public final class StepChain<I, O> {
 }
 
 extension StepChain where O: EquatableToAny {
-    public static func --- (_ chain: StepChain<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
+    public static func ---- (_ chain: StepChain<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
         return chain ---> MatchCondition<O>(condition)
     }
 

@@ -14,7 +14,7 @@ final class StepChainSequenceTests: XCTestCase {
     } ~ "step3"
 
     func testIterator() {
-        let chain = step1 --- { $0 < 2 } ---> step2 ---> step3 --- { $0.count < 4 } ---> step1 ---> step2
+        let chain = step1 ---- { $0 < 2 } ---> step2 ---> step3 ---- { $0.count < 4 } ---> step1 ---> step2
 
         var firstCount = 0
         for _ in chain {

@@ -32,25 +32,25 @@ public final class Step<I, O>: Nameable {
         return StepChain(step: lhs) ---> rhs
     }
 
-    public static func --- (_ step: Step<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
+    public static func ---- (_ step: Step<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> Condition<O>(condition)
     }
 
-    public static func --- (_ step: Step<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
+    public static func ---- (_ step: Step<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {
         return StepChain(step: step) ---> condition
     }
 
-    public static func --- (_ step: Step<I, O>, _ placeholder: @escaping PlaceHolderCondition.Literal) -> StepChain<I, O> {
+    public static func ---- (_ step: Step<I, O>, _ placeholder: @escaping PlaceHolderCondition.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> PlaceHolderCondition.new
     }
 }
 
 extension Step where O: EquatableToAny {
-    public static func --- (_ step: Step<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
+    public static func ---- (_ step: Step<I, O>, _ condition: @escaping MatchCondition<O>.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> MatchCondition<O>(condition)
     }
 
-    public static func --- (_ step: Step<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
+    public static func ---- (_ step: Step<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
         return StepChain(step: step) ---> condition
     }
 }

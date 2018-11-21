@@ -43,7 +43,7 @@ final class ProcessTests: XCTestCase {
     let sum1: Step<Optional<Int>, Int> = { $0.unsafelyUnwrapped + 1 } ~ "+1"
 
     func testProcessWithCondition() {
-        let process = Process([step1 ---- { $0 > 2 }~"Greater than 2" ---> step2 ---> step3])
+        let process = Process([step1 ---- "Greater than 2"~{ $0 > 2 } ---> step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         XCTAssertEqual(process.evaluationLog, "s1 ---- {Greater than 2} ---> s2 ---> s3")
@@ -91,8 +91,8 @@ final class ProcessTests: XCTestCase {
     }
 
     func testTwoLeafsWithCondition() {
-        let process = Process([step1 ---- { $0 >  2 }~"Great"  --->  step2 ---> step3,
-                               step1 ---- { $0 <= 2 }~"LessEq" ---> !step2 ---> step3])
+        let process = Process([step1 ---- "Great"~{ $0 >  2 }  --->  step2 ---> step3,
+                               step1 ---- "LessEq"~{ $0 <= 2 } ---> !step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         // TODO: On the evaluation log, we cannot distinguish s2 from its copy !s2
@@ -110,7 +110,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testMatchCondition() {
-        let process = Process([step1 ---- { 3 }~"is 3" ---> step2])
+        let process = Process([step1 ---- "is 3"~{ 3 } ---> step2])
 
         let result1 = process.evaluate("abc")
         XCTAssertEqual(result1, 6.5)
@@ -124,7 +124,7 @@ final class ProcessTests: XCTestCase {
 
     func testMatchAfterProjectionCondition() {
         let process = Process([
-            identity ---- { .some }~"is some?" ---> sum1
+            identity ---- "is some?"~{ .some } ---> sum1
         ])
 
         let result1 = process.evaluate(2)

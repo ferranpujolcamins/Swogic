@@ -8,25 +8,31 @@ struct SimpleError: Equatable, EquatableToAny {
     }
 }
 
-enum A: CaseIterable {
-    case a
-}
+enum HttpStatus: Equatable, EquatableAfterProjection {
+    static var projection: () -> HttpStatus.Projected
 
-enum HttpStatus: Equatable, EquatableToAny {
+
+    enum Projected {
+        case ok
+        case unauthorized
+        case internalError
+    }
+
     case ok
     case unauthorized(SimpleError)
     case internalError(SimpleError)
 
-    public func isEqual(to other: Any) -> Bool {
-        if let other = other as? HttpStatus {
-            switch (other, self) {
-            case (.ok, .ok), (.unauthorized, .unauthorized), (.internalError, .internalError):
-                return true
-            default:
-                return false
+    static var projection: (HttpStatus) -> Projected {
+        return {
+            switch $0 {
+            case .ok:
+                return .ok
+            case .unauthorized:
+                return .unauthorized
+            case .internalError:
+                return.internalError
             }
         }
-        return false
     }
 }
 
@@ -36,15 +42,15 @@ let refresh: Step<Void, HttpStatus>
 let logError: Step<HttpStatus, Void>
 
 let a: StepChain<Void, Void> = refresh ---- {  .ok   } ---> refresh.consume
-let b: StepChain<Void, HttpStatus> = refresh ---- { .unauthorized(SimpleError.dummy) }
+let b: StepChain<Void, HttpStatus> = refresh ---- { .unauthorized }
 let c: StepChain<Void, Void> = b ---> logError
-let d: StepChain<Void, Void> = refresh ---- { .unauthorized(SimpleError.dummy)  } ---> logError
+let d: StepChain<Void, Void> = refresh ---- { .unauthorized  } ---> logError
 
 // TODO: replace consume by operator
 let refreshAndRetry = Process([
     refresh ---- { .ok            } ---> refresh.consume ---> request ---> request.consume,
-    refresh ---- { .unauthorized(SimpleError.placeholder)  } ---> logError,
-    refresh ---- { .internalError(SimpleError.placeholder) } ---> logError
+    refresh ---- { .unauthorized  } ---> logError,
+    refresh ---- { .internalError } ---> logError
 ])
 
 let process = Process([

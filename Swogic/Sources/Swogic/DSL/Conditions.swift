@@ -41,19 +41,19 @@ public final class MatchAfterProjectionCondition<I: EquatableAfterProjection>: N
 }
 
 extension String {
-    public static func ~ <I> (_ literal: @escaping Condition<I>.Literal, _ name: String) -> Condition<I> {
+    public static func ~ <I> (_ name: String, _ literal: @escaping Condition<I>.Literal) -> Condition<I> {
         let condition = Condition(literal)
         condition.name = name
         return condition
     }
 
-    public static func ~ <I> (_ literal: @escaping MatchCondition<I>.Literal, _ name: String) -> MatchCondition<I> {
+    public static func ~ <I> (_ name: String, _ literal: @escaping MatchCondition<I>.Literal) -> MatchCondition<I> {
         let condition = MatchCondition(literal)
         condition.name = name
         return condition
     }
 
-    public static func ~ <I> (_ literal: @escaping MatchAfterProjectionCondition<I>.Literal, _ name: String) -> MatchAfterProjectionCondition<I> {
+    public static func ~ <I> (_ name: String, _ literal: @escaping MatchAfterProjectionCondition<I>.Literal) -> MatchAfterProjectionCondition<I> {
         let condition = MatchAfterProjectionCondition<I>(literal)
         condition.name = name
         return condition

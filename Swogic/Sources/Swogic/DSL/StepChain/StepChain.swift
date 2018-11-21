@@ -3,6 +3,7 @@ public enum ChainElement: Hashable, CustomDebugStringConvertible {
     case condition(TypeErasedCondition)
     case placeholderCondition(PlaceHolderCondition)
     case matchCondition(TypeErasedMatchCondition)
+    case matchAfterProjectionCondition(TypeErasedMatchAfterProjectionCondition)
 
     public var debugDescription: String {
         switch self {
@@ -14,6 +15,8 @@ public enum ChainElement: Hashable, CustomDebugStringConvertible {
         case .placeholderCondition(_):
             return ""
         case .matchCondition(let condition):
+            return condition.debugDescription
+        case .matchAfterProjectionCondition(let condition):
             return condition.debugDescription
         }
     }
@@ -51,6 +54,10 @@ internal indirect enum StepChainDataStructure {
 
     public static func + <I>(_ chain: StepChainDataStructure, _ condition: MatchCondition<I>) -> StepChainDataStructure {
         return chain + .matchCondition(TypeErasedMatchCondition(from: condition))
+    }
+
+    public static func + <I>(_ chain: StepChainDataStructure, _ condition: MatchAfterProjectionCondition<I>) -> StepChainDataStructure {
+        return chain + .matchAfterProjectionCondition(TypeErasedMatchAfterProjectionCondition(from: condition))
     }
 
     public static func + (_ chain: StepChainDataStructure, _ condition: PlaceHolderCondition) -> StepChainDataStructure {
@@ -99,6 +106,16 @@ extension StepChain where O: EquatableToAny {
     }
 
     public static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchCondition<O>) -> StepChain<I, O> {
+        return StepChain(stepChainData: stepChain.stepChainData + condition)
+    }
+}
+
+extension StepChain where O: EquatableAfterProjection {
+    public static func ---- (_ chain: StepChain<I, O>, _ condition: @escaping MatchAfterProjectionCondition<O>.Literal) -> StepChain<I, O> {
+        return chain ---> MatchAfterProjectionCondition<O>(condition)
+    }
+
+    public static func ---> (_ stepChain: StepChain<I, O>, _ condition: MatchAfterProjectionCondition<O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + condition)
     }
 }

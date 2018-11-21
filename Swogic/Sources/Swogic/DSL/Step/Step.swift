@@ -55,6 +55,16 @@ extension Step where O: EquatableToAny {
     }
 }
 
+extension Step where O: EquatableAfterProjection {
+    public static func ---- (_ step: Step<I, O>, _ condition: @escaping MatchAfterProjectionCondition<O>.Literal) -> StepChain<I, O> {
+        return StepChain(step: step) ---> MatchAfterProjectionCondition<O>(condition)
+    }
+
+    public static func ---- (_ step: Step<I, O>, _ condition: MatchAfterProjectionCondition<O>) -> StepChain<I, O> {
+        return StepChain(step: step) ---> condition
+    }
+}
+
 extension Step {
     var consume: Step<O, Void> {
         return Step<O, Void>({_ in })

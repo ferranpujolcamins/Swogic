@@ -47,11 +47,11 @@ let refreshAndRetry = Process([
     refresh ---- { .internalError(SimpleError.placeholder) } ---> logError
 ])
 
-let process = Process(
+let process = Process([
     login ---- { .ok            } ---> request ---- { .unauthorized  } ---> refreshAndRetry,
     login ---- { .ok            } ---> request ---- { .internalError } ---> logError,
     login ---- { .unauthorized  } ---> refreshAndRetry,
     login ---- { .internalError } ---> logError
 
     // TODO: think of a placeholder so we don't need to repeat login all the time
-)
+])

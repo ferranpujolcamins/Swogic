@@ -85,6 +85,11 @@ public class Process<I, O> {
                 evaluations[element] = p
                 return condition.evaluate(p)
 
+            case .matchAfterProjectionCondition(let condition):
+                let p = evaluations[prevElement]!
+                evaluations[element] = p
+                return condition.evaluate(p)
+
             case .placeholderCondition(_):
                 break
             }
@@ -111,6 +116,10 @@ public class Process<I, O> {
             evaluationLog += "{"+condition.debugDescription+"}"
 
         case (.step, .matchCondition(let condition)):
+            evaluationLog += " ---- "
+            evaluationLog += "{"+condition.debugDescription+"}"
+
+        case (.step, .matchAfterProjectionCondition(let condition)):
             evaluationLog += " ---- "
             evaluationLog += "{"+condition.debugDescription+"}"
 

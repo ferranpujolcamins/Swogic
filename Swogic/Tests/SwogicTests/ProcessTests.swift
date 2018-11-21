@@ -1,6 +1,26 @@
 import XCTest
 import Swogic
 
+// TODO: include this in the library
+extension Optional: EquatableAfterProjection {
+
+    public enum Projected: EquatableToAny, Equatable {
+        case none
+        case some
+    }
+
+    public static var projection: (Optional) -> Projected {
+        return {
+            switch $0 {
+            case .none:
+                return .none
+            case .some:
+                return .some
+            }
+        }
+    }
+}
+
 final class ProcessTests: XCTestCase {
 
     let step1: Step<String, Int> = { (str) -> Int in
@@ -18,6 +38,9 @@ final class ProcessTests: XCTestCase {
     let doubleToFalse: Step<Double, Bool> = {_ in
         return false
         } ~ "f"
+
+    let identity: Step<Optional<Int>, Optional<Int>> = { $0 } ~ "id"
+    let sum1: Step<Optional<Int>, Int> = { $0.unsafelyUnwrapped + 1 } ~ "+1"
 
     func testProcessWithCondition() {
         let process = Process([step1 ---- { $0 > 2 }~"Greater than 2" ---> step2 ---> step3])
@@ -47,8 +70,6 @@ final class ProcessTests: XCTestCase {
         ])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
-        // TODO: this log is not nice (we miss linebreaks) because it does not take into account the stack structure
-        print(process.evaluationLog)
         XCTAssertEqual(process.evaluationLog, """
         s1 ---> s2 ---> s3
            ---> s2 ---> s3
@@ -99,6 +120,20 @@ final class ProcessTests: XCTestCase {
         XCTAssertNil(result2)
         XCTAssertEqual(process.evaluationLog, "s1 ---- {is 3}")
 
+    }
+
+    func testMatchAfterProjectionCondition() {
+        let process = Process([
+            identity ---- { .some }~"is some?" ---> sum1
+        ])
+
+        let result1 = process.evaluate(2)
+        XCTAssertEqual(result1, 3)
+        XCTAssertEqual(process.evaluationLog, "id ---- {is some?} ---> +1")
+
+        let result2 = process.evaluate(nil)
+        XCTAssertEqual(result2, nil)
+        XCTAssertEqual(process.evaluationLog, "id ---- {is some?}")
     }
 
     var stepVoid1: Step<(), Int> = { () -> Int in

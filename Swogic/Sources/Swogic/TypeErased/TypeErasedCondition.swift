@@ -52,3 +52,33 @@ public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugString
         return (closure(()) as! EquatableToAny).isEqual(to: value)
     }
 }
+
+public class TypeErasedMatchAfterProjectionCondition: HashableRepresentative, CustomDebugStringConvertible {
+    public var name: String = ""
+
+    var representee: AnyObject
+
+    private let closure: (Any) -> Any
+    private let projection: (Any) -> Any
+
+    init<I>(from dslCondition: MatchAfterProjectionCondition<I>) {
+        closure = eraseType(dslCondition.pattern)
+        self.projection = eraseType(I.projection)
+        representee = dslCondition
+    }
+
+    public var debugDescription: String {
+        get {
+            if let representee = representee as? CustomDebugStringConvertible {
+                return representee.debugDescription
+            } else {
+                return ""
+            }
+        }
+    }
+
+    public func evaluate(_ value: Any) -> Bool {
+
+        return (closure(()) as! EquatableToAny).isEqual(to: projection(value))
+    }
+}

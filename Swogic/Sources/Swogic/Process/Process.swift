@@ -27,6 +27,8 @@ public final class Process<I, O>: Nameable, EvaluationLog {
 
     private let graph: UniqueElementsGraph<IndentedChainElement>
     private let initialElement: IndentedChainElement
+
+    // TODO: overload for only one chain
     public init(_ chains: [StepChain<I, O>]) {
         let chains = chains.map({Array($0)})
         let graphs = chains
@@ -186,5 +188,9 @@ public final class Process<I, O>: Nameable, EvaluationLog {
         }
 
         return logInitialCount
+    }
+
+    public static prefix func ! (_ process: Process<I, O>) -> Process<I, O> {
+        return process.copy()
     }
 }

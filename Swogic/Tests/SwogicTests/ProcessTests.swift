@@ -141,8 +141,41 @@ final class ProcessTests: XCTestCase {
         let process = "process" ~ Process([step1 ---> subProcess ---> !step1])
         let result: Int? = process.evaluate("Donkey")
 
-        print(process.evaluationLog)
         XCTAssertEqual(result, 14)
+        XCTAssertEqual(process.evaluationLog, "s1 ---> s2 ---> s3 ---> s1")
+
+        let process2 = "process2" ~ Process([step1 ---> subProcess])
+        let result2: String? = process2.evaluate("Donkey")
+
+        XCTAssertEqual(result2, "Number is: 9.5")
+        XCTAssertEqual(process2.evaluationLog, "s1 ---> s2 ---> s3")
+    }
+
+    func testSubProcess2() {
+        let subProcess = "subprocess" ~ Process([step2 ---> step3])
+        let process = "process" ~ Process([
+            step1 ---> subProcess ---> !step1,
+            step1 ---> subProcess ---> !step1,
+        ])
+        let result: Int? = process.evaluate("Donkey")
+
+        XCTAssertEqual(result, 14)
+        XCTAssertEqual(process.evaluationLog, """
+        s1 ---> s2 ---> s3 ---> s1
+                           ---> s1
+        """)
+
+        let process2 = "process2" ~ Process([
+            step1 ---> subProcess,
+            step1 ---> !subProcess
+        ])
+        let result2: String? = process2.evaluate("Donkey")
+
+        XCTAssertEqual(result2, "Number is: 9.5")
+        XCTAssertEqual(process2.evaluationLog, """
+        s1 ---> s2 ---> s3
+           ---> s2 ---> s3
+        """)
     }
 
     var stepVoid1: Step<(), Int> = { () -> Int in

@@ -2,17 +2,10 @@
 
 struct SimpleError: Equatable, EquatableToAny {
     let errorMessage: String
-
-    static var placeholder: SimpleError {
-        return SimpleError(errorMessage: "dummy")
-    }
 }
 
 enum HttpStatus: Equatable, EquatableAfterProjection {
-    static var projection: () -> HttpStatus.Projected
-
-
-    enum Projected {
+    enum Projected: Equatable, EquatableToAny {
         case ok
         case unauthorized
         case internalError
@@ -40,11 +33,6 @@ let login: Step<Void, HttpStatus>
 let request: Step<Void, HttpStatus>
 let refresh: Step<Void, HttpStatus>
 let logError: Step<HttpStatus, Void>
-
-let a: StepChain<Void, Void> = refresh ---- {  .ok   } ---> refresh.consume
-let b: StepChain<Void, HttpStatus> = refresh ---- { .unauthorized }
-let c: StepChain<Void, Void> = b ---> logError
-let d: StepChain<Void, Void> = refresh ---- { .unauthorized  } ---> logError
 
 // TODO: replace consume by operator
 let refreshAndRetry = Process([

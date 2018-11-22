@@ -1,6 +1,4 @@
 public class TypeErasedCondition: HashableRepresentative, CustomDebugStringConvertible {
-    public var name: String = ""
-
     var representee: AnyObject
 
     private let closure: (Any) -> Any
@@ -26,8 +24,6 @@ public class TypeErasedCondition: HashableRepresentative, CustomDebugStringConve
 }
 
 public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugStringConvertible {
-    public var name: String = ""
-
     var representee: AnyObject
 
     private let closure: (Any) -> Any
@@ -54,8 +50,6 @@ public class TypeErasedMatchCondition: HashableRepresentative, CustomDebugString
 }
 
 public class TypeErasedMatchAfterProjectionCondition: HashableRepresentative, CustomDebugStringConvertible {
-    public var name: String = ""
-
     var representee: AnyObject
 
     private let closure: (Any) -> Any

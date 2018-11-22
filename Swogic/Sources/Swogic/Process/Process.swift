@@ -1,6 +1,6 @@
 import SwiftGraph
 
-public class IndentedChainElement: Equatable {
+public class IndentedChainElement: Equatable, CustomDebugStringConvertible {
     let element: ChainElement
     var indentation: Int = 0
 
@@ -11,9 +11,20 @@ public class IndentedChainElement: Equatable {
     public static func == (lhs: IndentedChainElement, rhs: IndentedChainElement) -> Bool {
         return lhs.element == rhs.element
     }
+
+    public var debugDescription: String {
+        return element.debugDescription
+    }
 }
 
-public class Process<I, O> {
+protocol EvaluationLog {
+    var evaluationLog: String { get }
+}
+
+public final class Process<I, O>: Nameable, EvaluationLog {
+
+    public var name: String = ""
+
     private let graph: UniqueElementsGraph<IndentedChainElement>
     private let initialElement: IndentedChainElement
     public init(_ chains: [StepChain<I, O>]) {
@@ -31,6 +42,22 @@ public class Process<I, O> {
         graph = UniqueElementsGraph(unionOf: graphs)
     }
 
+    private init(graph: UniqueElementsGraph<IndentedChainElement>, initialElement: IndentedChainElement, name: String, evaluationLog: String, lastVisitedElement: IndentedChainElement!) {
+        self.graph = graph
+        self.initialElement = initialElement
+        self.name = name
+        self.evaluationLog = evaluationLog
+        self.lastVisitedElement = lastVisitedElement
+    }
+
+    public func copy() -> Process<I, O> {
+        return Process(graph: self.graph,
+                       initialElement: self.initialElement,
+                       name: self.name,
+                       evaluationLog: self.evaluationLog,
+                       lastVisitedElement: self.lastVisitedElement)
+    }
+
     public var evaluationLog = ""
     // Initialized with a dummy value that will be replaced
     private var lastVisitedElement: IndentedChainElement!
@@ -46,7 +73,7 @@ public class Process<I, O> {
         // Initial step, repeated code
         let partialResult = initialStep.closure(p)
         evaluations[initialElement.element] = partialResult
-        if ( graph.edgesForIndex(initialIndex).count == 0 && firstFinalResult == nil) {
+        if (graph.edgesForIndex(initialIndex).count == 0 && firstFinalResult == nil) {
             firstFinalResult = partialResult
         }
         evaluationLog = initialStep.debugDescription
@@ -63,9 +90,8 @@ public class Process<I, O> {
             let prevElement = prevElementIndexed.element
             let element = elementIndexed.element
 
-            let newIndentation = logStep(prevElement: prevElementIndexed, element: elementIndexed)
-            elementIndexed.indentation = newIndentation
-            lastVisitedElement = elementIndexed
+            var shouldVisitNeighbours = true
+
             switch element {
 
             case .step(let step):
@@ -75,25 +101,38 @@ public class Process<I, O> {
                     firstFinalResult = partialResult
                 }
 
+            case .process(let process):
+                let partialResult = process.closure(evaluations[prevElement]!)
+                evaluations[element] = partialResult
+                if (graph.edgesForIndex(edge.v).count == 0 && firstFinalResult == nil) {
+                    firstFinalResult = partialResult
+                }
+
             case .condition(let condition):
                 let p = evaluations[prevElement]!
                 evaluations[element] = p
-                return condition.evaluate(p)
+                shouldVisitNeighbours = condition.evaluate(p)
 
             case .matchCondition(let condition):
                 let p = evaluations[prevElement]!
                 evaluations[element] = p
-                return condition.evaluate(p)
+                shouldVisitNeighbours = condition.evaluate(p)
 
             case .matchAfterProjectionCondition(let condition):
                 let p = evaluations[prevElement]!
                 evaluations[element] = p
-                return condition.evaluate(p)
+                shouldVisitNeighbours = condition.evaluate(p)
 
             case .placeholderCondition(_):
+                // TODO: test placeholder condition
                 break
             }
-            return true
+
+            let newIndentation = logStep(prevElement: prevElementIndexed, element: elementIndexed)
+            elementIndexed.indentation = newIndentation
+            lastVisitedElement = elementIndexed
+
+            return shouldVisitNeighbours
         })
         return firstFinalResult.flatMap({ $0 as? O})
     }
@@ -111,19 +150,38 @@ public class Process<I, O> {
             evaluationLog += " ---> "
             evaluationLog += step.debugDescription
 
-        case (.step, .condition(let condition)):
+        case (_, .process(let process)):
+            evaluationLog += " ---> "
+            evaluationLog += process.evaluationLog
+
+        case (.step, .condition(let condition)),
+             (.process, .condition(let condition)):
             evaluationLog += " ---- "
             evaluationLog += "{"+condition.debugDescription+"}"
 
-        case (.step, .matchCondition(let condition)):
+        case (.step, .matchCondition(let condition)),
+             (.process, .matchCondition(let condition)):
             evaluationLog += " ---- "
             evaluationLog += "{"+condition.debugDescription+"}"
 
-        case (.step, .matchAfterProjectionCondition(let condition)):
+        case (.step, .matchAfterProjectionCondition(let condition)),
+             (.process, .matchAfterProjectionCondition(let condition)):
             evaluationLog += " ---- "
             evaluationLog += "{"+condition.debugDescription+"}"
 
-        case (_, _):
+        case (.condition(_), .condition(_)),
+             (.placeholderCondition(_), .condition(_)),
+             (.matchCondition(_), .condition(_)),
+             (.matchAfterProjectionCondition(_), .condition(_)),
+             (.condition(_), .matchCondition(_)),
+             (.placeholderCondition(_), .matchCondition(_)),
+             (.matchCondition(_), .matchCondition(_)),
+             (.matchAfterProjectionCondition(_), .matchCondition(_)),
+             (.condition(_), .matchAfterProjectionCondition(_)),
+             (.placeholderCondition(_), .matchAfterProjectionCondition(_)),
+             (.matchCondition(_), .matchAfterProjectionCondition(_)),
+             (.matchAfterProjectionCondition(_), .matchAfterProjectionCondition(_)),
+             (_, .placeholderCondition(_)):
             break
         }
 

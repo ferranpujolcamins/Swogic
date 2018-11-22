@@ -1,5 +1,6 @@
 public enum ChainElement: Hashable, CustomDebugStringConvertible {
     case step(TypeErasedStep)
+    case process(TypeErasedProcess)
     case condition(TypeErasedCondition)
     case placeholderCondition(PlaceHolderCondition)
     case matchCondition(TypeErasedMatchCondition)
@@ -10,6 +11,8 @@ public enum ChainElement: Hashable, CustomDebugStringConvertible {
 
         case .step(let step):
             return step.debugDescription
+        case .process(let process):
+            return process.debugDescription
         case .condition(let condition):
             return condition.debugDescription
         case .placeholderCondition(_):
@@ -46,6 +49,10 @@ internal indirect enum StepChainDataStructure {
 
     public static func + <I, O>(_ chain: StepChainDataStructure, _ newStep: Step<I, O>) -> StepChainDataStructure {
         return chain + .step(TypeErasedStep(from: newStep))
+    }
+
+    public static func + <I, O>(_ chain: StepChainDataStructure, _ process: Process<I, O>) -> StepChainDataStructure {
+        return chain + .process(TypeErasedProcess(from: process))
     }
 
     public static func + <I>(_ chain: StepChainDataStructure, _ condition: Condition<I>) -> StepChainDataStructure {
@@ -89,6 +96,10 @@ public final class StepChain<I, O> {
 
     public static func ---> <U> (_ stepChain: StepChain<I, U>, _ newStep: Step<U, O>) -> StepChain<I, O> {
         return StepChain(stepChainData: stepChain.stepChainData + newStep)
+    }
+
+    public static func ---> <U> (_ stepChain: StepChain<I, U>, _ process: Process<U, O>) -> StepChain<I, O> {
+        return StepChain(stepChainData: stepChain.stepChainData + process)
     }
 
     public static func ---> (_ stepChain: StepChain<I, O>, _ condition: Condition<O>) -> StepChain<I, O> {

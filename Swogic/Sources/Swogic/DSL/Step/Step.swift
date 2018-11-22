@@ -32,6 +32,10 @@ public final class Step<I, O>: Nameable {
         return StepChain(step: lhs) ---> rhs
     }
 
+    public static func ---> <U> (_ step: Step<I, U>, _ process: Process<U, O>) -> StepChain<I, O> {
+        return StepChain(step: step) ---> process
+    }
+
     public static func ---- (_ step: Step<I, O>, _ condition: @escaping Condition<O>.Literal) -> StepChain<I, O> {
         return StepChain(step: step) ---> Condition<O>(condition)
     }

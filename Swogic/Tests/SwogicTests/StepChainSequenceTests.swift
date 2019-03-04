@@ -3,13 +3,13 @@ import XCTest
 
 final class StepChainSequenceTests: XCTestCase {
 
-    var step1: Step<String, Int> = { (str) -> Int in
+    var step1: State<String, Int> = { (str) -> Int in
         str.count
     } ~ "step1"
-    var step2: Step<Int, Double> = { (i: Int) -> Double in
+    var step2: State<Int, Double> = { (i: Int) -> Double in
         Double(i) + 3.5
     } ~ "step2"
-    var step3: Step<Double, String> = { (d) -> String in
+    var step3: State<Double, String> = { (d) -> String in
         "Number is: " + String(d)
     } ~ "step3"
 
@@ -28,7 +28,7 @@ final class StepChainSequenceTests: XCTestCase {
         XCTAssertEqual(firstCount, 7, "Sequence has the wrong number of items")
         XCTAssertEqual(secondCount, 7, "Sequence is consumed when iterated")
 
-        let c: AnySequence<ChainElement> = chain.dropFirst(3)
+        let c: AnySequence<StateSequenceElement> = chain.dropFirst(3)
 
         guard case .step(let step)? = c.makeIterator().next() else {
             XCTFail("Iterator didn't return a step")

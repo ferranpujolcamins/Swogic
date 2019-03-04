@@ -23,27 +23,27 @@ extension Optional: EquatableAfterProjection {
 
 final class ProcessTests: XCTestCase {
 
-    let step1: Step<String, Int> = { (str) -> Int in
+    let step1: State<String, Int> = { (str) -> Int in
         return str.count
         } ~ "s1"
-    let step2: Step<Int, Double> = { (i: Int) -> Double in
+    let step2: State<Int, Double> = { (i: Int) -> Double in
         return Double(i) + 3.5
         } ~ "s2"
-    let step3: Step<Double, String> = { (d) -> String in
+    let step3: State<Double, String> = { (d) -> String in
         return "Number is: " + String(d)
         } ~ "s3"
-    let doubleToTrue: Step<Double, Bool> = {_ in
+    let doubleToTrue: State<Double, Bool> = {_ in
         return true
         } ~ "t"
-    let doubleToFalse: Step<Double, Bool> = {_ in
+    let doubleToFalse: State<Double, Bool> = {_ in
         return false
         } ~ "f"
 
-    let identity: Step<Optional<Int>, Optional<Int>> = { $0 } ~ "id"
-    let sum1: Step<Optional<Int>, Int> = { $0.unsafelyUnwrapped + 1 } ~ "+1"
+    let identity: State<Optional<Int>, Optional<Int>> = { $0 } ~ "id"
+    let sum1: State<Optional<Int>, Int> = { $0.unsafelyUnwrapped + 1 } ~ "+1"
 
     func testProcessWithCondition() {
-        let process = Process([step1 ---- "Greater than 2"~{ $0 > 2 } ---> step2 ---> step3])
+        let process = StateMachine([step1 ---- "Greater than 2"~{ $0 > 2 } ---> step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
         XCTAssertEqual(process.evaluationLog, "s1 ---- {Greater than 2} ---> s2 ---> s3")
@@ -54,7 +54,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testSingleBranchStatedTwice() {
-        let process = Process([
+        let process = StateMachine([
             step1 ---> step2 ---> step3,
             step1 ---> step2 ---> step3
             ])
@@ -64,7 +64,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testDoubleBranch() {
-        let process = Process([
+        let process = StateMachine([
             step1 --->  step2 --->  step3,
             step1 ---> !step2 ---> !step3
         ])
@@ -78,7 +78,7 @@ final class ProcessTests: XCTestCase {
 
     func testTwoLeafs() {
 
-        let process = Process([
+        let process = StateMachine([
             step1 ---> step2 ---> doubleToTrue,
             step1 ---> step2 ---> doubleToFalse
             ])
@@ -91,7 +91,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testTwoLeafsWithCondition() {
-        let process = Process([step1 ---- "Great"~{ $0 >  2 }  --->  step2 ---> step3,
+        let process = StateMachine([step1 ---- "Great"~{ $0 >  2 }  --->  step2 ---> step3,
                                step1 ---- "LessEq"~{ $0 <= 2 } ---> !step2 ---> step3])
         let result: String? = process.evaluate("Donkey")
         XCTAssertEqual(result!, "Number is: 9.5")
@@ -110,7 +110,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testMatchCondition() {
-        let process = Process([step1 ---- "is 3"~{ 3 } ---> step2])
+        let process = StateMachine([step1 ---- "is 3"~{ 3 } ---> step2])
 
         let result1 = process.evaluate("abc")
         XCTAssertEqual(result1, 6.5)
@@ -123,7 +123,7 @@ final class ProcessTests: XCTestCase {
     }
 
     func testMatchAfterProjectionCondition() {
-        let process = Process([
+        let process = StateMachine([
             identity ---- "is some?"~{ .some } ---> sum1
         ])
 
@@ -137,14 +137,14 @@ final class ProcessTests: XCTestCase {
     }
 
     func testSubProcess() {
-        let subProcess = "subprocess" ~ Process([step2 ---> step3])
-        let process = "process" ~ Process([step1 ---> subProcess ---> !step1])
+        let subProcess = "subprocess" ~ StateMachine([step2 ---> step3])
+        let process = "process" ~ StateMachine([step1 ---> subProcess ---> !step1])
         let result: Int? = process.evaluate("Donkey")
 
         XCTAssertEqual(result, 14)
         XCTAssertEqual(process.evaluationLog, "s1 ---> s2 ---> s3 ---> s1")
 
-        let process2 = "process2" ~ Process([step1 ---> subProcess])
+        let process2 = "process2" ~ StateMachine([step1 ---> subProcess])
         let result2: String? = process2.evaluate("Donkey")
 
         XCTAssertEqual(result2, "Number is: 9.5")
@@ -152,8 +152,8 @@ final class ProcessTests: XCTestCase {
     }
 
     func testSubProcess2() {
-        let subProcess = "subprocess" ~ Process([step2 ---> step3])
-        let process = "process" ~ Process([
+        let subProcess = "subprocess" ~ StateMachine([step2 ---> step3])
+        let process = "process" ~ StateMachine([
             step1 ---> subProcess ---> !step1,
             step1 ---> subProcess ---> !step1,
         ])
@@ -165,7 +165,7 @@ final class ProcessTests: XCTestCase {
                            ---> s1
         """)
 
-        let process2 = "process2" ~ Process([
+        let process2 = "process2" ~ StateMachine([
             step1 ---> subProcess,
             step1 ---> !subProcess
         ])
@@ -178,18 +178,18 @@ final class ProcessTests: XCTestCase {
         """)
     }
 
-    var stepVoid1: Step<(), Int> = { () -> Int in
+    var stepVoid1: State<(), Int> = { () -> Int in
         return 1
     } ~ "s1"
-    var stepVoid2: Step<Int, ()> = { (i) -> () in
+    var stepVoid2: State<Int, ()> = { (i) -> () in
         return ()
     } ~ "s2"
-    var stepVoid3: Step<(), ()> = { () -> () in
+    var stepVoid3: State<(), ()> = { () -> () in
         return ()
     } ~ "s3"
 
     func testVoidProcess() {
-        let process = Swogic.Process<(), ()>([
+        let process = Swogic.StateMachine<(), ()>([
             stepVoid1 ---> stepVoid2 ---- { _ in true } ---> stepVoid3
         ])
         _ = process.evaluate(())

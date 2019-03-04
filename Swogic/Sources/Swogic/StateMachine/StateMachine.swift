@@ -1,10 +1,10 @@
 import SwiftGraph
 
 public class IndentedChainElement: Equatable, CustomDebugStringConvertible {
-    let element: ChainElement
+    let element: StateSequenceElement
     var indentation: Int = 0
 
-    init(_ element: ChainElement) {
+    init(_ element: StateSequenceElement) {
         self.element = element
     }
 
@@ -21,7 +21,8 @@ protocol EvaluationLog {
     var evaluationLog: String { get }
 }
 
-public final class Process<I, O>: Nameable, EvaluationLog {
+// TODO: separate grpah constructing from execution
+public final class StateMachine<StateType, EventType, EffectType>: Nameable, EvaluationLog {
 
     public var name: String = ""
 
@@ -29,7 +30,7 @@ public final class Process<I, O>: Nameable, EvaluationLog {
     private let initialElement: IndentedChainElement
 
     // TODO: overload for only one chain
-    public init(_ chains: [StepChain<I, O>]) {
+    public init(_ chains: [StateSequence<StateType>]) {
         let chains = chains.map({Array($0)})
         let graphs = chains
             .map({ $0.map({ IndentedChainElement($0) }) })
@@ -52,8 +53,8 @@ public final class Process<I, O>: Nameable, EvaluationLog {
         self.lastVisitedElement = lastVisitedElement
     }
 
-    public func copy() -> Process<I, O> {
-        return Process(graph: self.graph,
+    public func copy() -> StateMachine {
+        return StateMachine(graph: self.graph,
                        initialElement: self.initialElement,
                        name: self.name,
                        evaluationLog: self.evaluationLog,
@@ -65,7 +66,7 @@ public final class Process<I, O>: Nameable, EvaluationLog {
     private var lastVisitedElement: IndentedChainElement!
 
     public func evaluate(_ p: I) -> O? {
-        var evaluations = Dictionary<ChainElement, Any>()
+        var evaluations = Dictionary<StateSequenceElement, Any>()
 
         var firstFinalResult: Any? = nil
 
@@ -190,7 +191,7 @@ public final class Process<I, O>: Nameable, EvaluationLog {
         return logInitialCount
     }
 
-    public static prefix func ! (_ process: Process<I, O>) -> Process<I, O> {
+    public static prefix func ! (_ process: StateMachine) -> StateMachine {
         return process.copy()
     }
 }

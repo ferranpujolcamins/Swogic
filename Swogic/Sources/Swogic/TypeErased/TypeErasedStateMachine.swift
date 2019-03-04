@@ -1,16 +1,16 @@
-public class TypeErasedProcess: HashableRepresentative, EvaluationLog, CustomDebugStringConvertible {
+public class TypeErasedStateMachine: HashableRepresentative, EvaluationLog, CustomDebugStringConvertible {
     var representee: AnyObject
 
     public var name: String
 
     let closure: (Any) -> Any
 
-    init<I,O>(from dslProcess: Process<I, O>) {
-        name = dslProcess.name
+    init<I,O>(from stateMachine: StateMachine<I, O>) {
+        name = stateMachine.name
         closure = eraseType({
             dslProcess.evaluate($0) as Any
         })
-        representee = dslProcess
+        representee = stateMachine
     }
 
     public var evaluationLog: String {

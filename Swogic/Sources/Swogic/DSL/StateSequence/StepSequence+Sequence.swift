@@ -1,20 +1,20 @@
-extension StepChain: Sequence {
+extension StateSequence: Sequence {
     public class Iterator: IteratorProtocol {
-        public typealias Element = ChainElement
+        public typealias Element = StateSequenceElement
 
-        var chain: StepChainDataStructure?
+        var chain: StateSequenceDataStructure?
 
-        init (_ chain: StepChainDataStructure) {
+        init (_ chain: StateSequenceDataStructure) {
             self.chain = chain
         }
 
-        public func next() -> ChainElement? {
+        public func next() -> StateSequenceElement? {
 
             switch chain {
-            case .step(let step)?:
+            case .state(let step)?:
                 chain = nil
                 return step
-            case .stepChain(let childChain, let step)?:
+            case .stateSequence(let childChain, let step)?:
                 chain = childChain
                 return step
             case .none:

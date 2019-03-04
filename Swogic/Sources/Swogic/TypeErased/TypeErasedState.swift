@@ -1,14 +1,14 @@
-public class TypeErasedStep: HashableRepresentative, CustomDebugStringConvertible {
+public class TypeErasedState: HashableRepresentative, CustomDebugStringConvertible {
     var representee: AnyObject
 
     public var name: String
 
-    let closure: (Any) -> Any
+    let state: Any
 
-    init<I,O>(from dslStep: Step<I, O>) {
-        name = dslStep.name
-        closure = eraseType(dslStep.closure)
-        representee = dslStep
+    init<StateType>(from dslState: State<StateType>) {
+        name = dslState.name
+        state = Any(dslState)
+        representee = dslState
     }
 
     public var debugDescription: String {
